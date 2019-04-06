@@ -2,7 +2,7 @@ from glob import glob
 import subprocess
 
 
-prog = "a.out"
+prog = "./a.out"
 files = glob("tests/*.lua")
 
 for arg in files:

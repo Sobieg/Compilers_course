@@ -14,8 +14,11 @@ for tests
 
 %%
 "//".*						{printf("C -comment");}
-"--[[".*"]]--"				{printf("KEK\n");}
-"--[["[\n*?\S]*?"]]--"				{printf("KEK\n");}
-.			 					{printf("%c", *yytext);	}
+"--[[".*?|[\n]*?"]]--"			{
+								printf("KEK\n");
+								return 0;
+							}
+.			 				{
+							printf("%c", *yytext);	
+							}
 %%
-

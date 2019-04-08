@@ -49,14 +49,15 @@ for tests
 							}
 
 "--[["(.|\n)*?"]]--"		{
-								printf("Multiline comment\n");
+								//printf("Multiline comment\n");
 								//return 0;
 							}
 "--".*?						{
-								printf("Singleline comment\n");
+								//printf("Singleline comment\n");
 								//return 0;
 							}
 .			 				{
-							printf("%c", *yytext);	
+								//return *yytext;
+							//printf("%c", *yytext);	
 							}
 %%

@@ -1,3 +1,5 @@
 *.c
 *.h
 *.out
+results
+tests/*[0-9].lua

@@ -4,10 +4,12 @@ YACC=yacc
 YFLAGS=-d
 RM=rm -f
 PY=python3
+RESULTDIR=results\\
+TESTSDIR=tests\\
 
 TARGET=compile
 
-.PHONY: all clean clear tests
+.PHONY: tests
 
 
 all: $(TARGET)
@@ -29,4 +31,5 @@ debug: lex.yy.c
 	$(CXX) lex.yy.c 
 
 tests: 
+	-$(RM) $(RESULTDIR)*.result
 	$(PY) autotests.py

@@ -21,6 +21,7 @@
 	OPS: 			;
 %%
 
-int main() {
-	return yyparse();
+int main(int argc, char** argv) {
+	yyparse();
+	//std::cout << (!yyparse()? "OK" : "Not OK") << std::endl;
 }

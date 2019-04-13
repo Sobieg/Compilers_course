@@ -7,7 +7,7 @@ prog = "./a.out"
 file = open(sys.argv[1])
 
 
-proc = subprocess.Popen(prog, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+proc = subprocess.Popen(prog, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
 lines = ""
 for line in file:
 	lines = lines + line
@@ -18,6 +18,7 @@ outfile = outfile + sys.argv[1][len("tests/"):] + ".result"
 output = open(outfile, "w+")
 for line in data:
 	if line:
-		output.write(line.decode('utf'))
+		newline = line.decode('utf')
+		output.write(newline)
 
 

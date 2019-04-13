@@ -12,16 +12,35 @@
 
 %token AND BREAK DO ELSE ELSEIF END FALSE GOTO FOR FUNCTION IF IN 
 %token LOCAL NIL NOT OR REPEAT RETURN THEN TRUE UNTIL WHILE
-%token VAR NUM
+%token VAR NUM STRING NIL
 
 
 %%
-	program: 		OPS;
+	program: 		ops;
 
-	OPS: 			;
+	ops: 			op | ops op;
+
+	op:				expr; //there
+
+	expr:			VAR '=' VAR 
+					| VAR '=' value
+					;
+	
+	value:			NUM 
+					| STRING
+					| TRUE
+					| FALSE
+					| NIL
+					| '-' value
+					| '!' value
+					| '(' expr ')'
+					;
+		
+
+
 %%
 
 int main(int argc, char** argv) {
-	yyparse();
-	//std::cout << (!yyparse()? "OK" : "Not OK") << std::endl;
+	//yyparse();
+	std::cout << (!yyparse()? "OK" : "Not OK") << std::endl;
 }

@@ -37,6 +37,7 @@ for tests
 "true"						return TRUE;
 "until"						return UNTIL;
 "while"						return WHILE;
+"nil"						return NIL;
 
 
 
@@ -45,19 +46,41 @@ for tests
 							}
 
 [a-zA-Z_]+[a-zA-Z0-9_]*		{
+								//std::cout << "VAR" << std::endl;
 								return VAR;
+							}
+
+'[^'\n]*'						{
+								//std::cout << "STRING" << std::endl;
+								return STRING;
+
+							}
+
+\"[^"\n]*\"					{
+								//std::cout << "STRING" << std::endl;
+								return STRING;
+							}
+
+"[["([\]][ \n]+|[^\]][^\]]|\n)*?"]]" 	{
+
+								//std::cout << "STRING" << std::endl;
+								return STRING;
 							}
 
 "--[["(.|\n)*?"]]--"		{
 								//printf("Multiline comment\n");
 								//return 0;
 							}
+
 "--".*?						{
 								//printf("Singleline comment\n");
 								//return 0;
 							}
-.			 				{
-								//return *yytext;
-							//printf("%c", *yytext);	
+
+[ \t\r\n] 					{;}
+
+.			 				{							
+							//printf("%c", *yytext);
+							return *yytext;	
 							}
 %%

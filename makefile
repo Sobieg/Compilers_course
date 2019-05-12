@@ -29,7 +29,7 @@ y.tab.c: lua_syntax_check.yacc
 	$(YACC) $(YFLAGS) lua_syntax_check.yacc
 
 git:
-	$(GIT) checkout master
+	$(GIT) checkout everymake-commit
 	$(GIT) add .
 	$(GIT) commit -am $(DATE)
 

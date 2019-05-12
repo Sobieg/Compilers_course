@@ -31,7 +31,10 @@ y.tab.c: lua_syntax_check.yacc
 git:
 	$(GIT) checkout everymake-commit
 	$(GIT) add .
-	$(GIT) commit -am $(DATE)
+	$(GIT) commit -am "$(shell date)"
+
+test:
+	$(DATE) + "%y.%m.%d %H:%M:%S"
 
 compile: lex.yy.c y.tab.c y.tab.h git
 	$(CXX) lex.yy.c y.tab.c

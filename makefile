@@ -8,6 +8,7 @@ RESULTDIR=results\\
 TESTSDIR=tests\\
 ETDIR=etalon\\
 GIT=git
+GITFLAGS=-am
 
 TARGET=compile
 
@@ -26,7 +27,12 @@ lex.yy.c: lua_syntax_check.lex
 y.tab.c: lua_syntax_check.yacc
 	$(YACC) $(YFLAGS) lua_syntax_check.yacc
 
-compile: lex.yy.c y.tab.c y.tab.h
+git:
+	$(GIT) checkout master
+	$(GIT) add .
+	$(GIT) commit -am date
+
+compile: lex.yy.c y.tab.c y.tab.h git
 	$(CXX) lex.yy.c y.tab.c
 
 debug: lex.yy.c
@@ -41,3 +47,4 @@ etupd:
 	-$(RM) errors.log
 	-$(RM) $(ETDIR) 
 	cp $(RESULTDIR)*.result $(ETDIR) 
+

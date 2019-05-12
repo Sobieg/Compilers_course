@@ -1,11 +1,13 @@
 CXX=g++
 LEX=lex
 YACC=yacc
-YFLAGS=-d
-RM=rm -f
+YFLAGS=-d -v -t
+RM=rm -rf
 PY=python3
 RESULTDIR=results\\
 TESTSDIR=tests\\
+ETDIR=etalon\\
+GIT=git
 
 TARGET=compile
 
@@ -32,4 +34,10 @@ debug: lex.yy.c
 
 tests: 
 	-$(RM) $(RESULTDIR)*.result
+	-$(RM) errors.log
 	$(PY) autotests.py
+
+etupd:
+	-$(RM) errors.log
+	-$(RM) $(ETDIR) 
+	cp $(RESULTDIR)*.result $(ETDIR) 

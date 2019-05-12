@@ -11,7 +11,7 @@
 for tests 
 %option main
 */
-
+string "[["([\]][ \n]+|[^\]][^\]]|\n)*?"]]"
 
 
 %%
@@ -44,13 +44,16 @@ for tests
 [0-9]+						{	
 								return NUM;
 							}
-
-[a-zA-Z_]+[a-zA-Z0-9_]*		{
-								//std::cout << "VAR" << std::endl;
-								return VAR;
+[0-9]"."[0-9]+				{
+								return NUM;
 							}
 
-'[^'\n]*'						{
+[a-zA-Z_]+[a-zA-Z0-9_]*		{
+								//std::cout << "ID" << std::endl;
+								return ID;
+							}
+
+'[^'\n]*'					{
 								//std::cout << "STRING" << std::endl;
 								return STRING;
 
@@ -61,13 +64,13 @@ for tests
 								return STRING;
 							}
 
-"[["([\]][ \n]+|[^\]][^\]]|\n)*?"]]" 	{
+string 						{
 
 								//std::cout << "STRING" << std::endl;
 								return STRING;
 							}
 
-"--[["(.|\n)*?"]]--"		{
+"--"string	{
 								//printf("Multiline comment\n");
 								//return 0;
 							}
@@ -77,7 +80,7 @@ for tests
 								//return 0;
 							}
 
-[ \t\r\n] 					{;}
+[ \t\r\n] 					{}
 
 .			 				{							
 							//printf("%c", *yytext);

@@ -1,6 +1,7 @@
 from glob import glob
 import subprocess
 import filecmp
+import os.path
 
 
 prog = "./a.out"
@@ -17,3 +18,11 @@ for file in files:
 
 for proc in processes:
 	proc.wait()
+
+
+
+if os.path.exists("errors.log"):
+	print("There is errors: ")
+	with open("errors.log", "r") as err:
+		for line in err:
+			print(line, end='')

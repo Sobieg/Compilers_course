@@ -1,0 +1,536 @@
+Terminals unused in grammar
+
+   AND
+   BREAK
+   DO
+   ELSE
+   ELSEIF
+   END
+   GOTO
+   FOR
+   FUNCTION
+   IF
+   IN
+   LOCAL
+   NOT
+   OR
+   REPEAT
+   RETURN
+   THEN
+   UNTIL
+   WHILE
+
+
+State 10 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: ops
+
+    2 ops: op
+    3    | ops op
+
+    4 op: expr
+    5   | func_call
+
+    6 exprs: expr
+    7      | exprs expr
+    8      | %empty
+
+    9 expr: ID '=' ID
+   10     | ID '=' value
+
+   11 value: NUM
+   12      | STRING
+   13      | TRUE
+   14      | FALSE
+   15      | NIL
+   16      | '-' value
+   17      | '!' value
+   18      | '(' expr ')'
+
+   19 func_call: ID '(' func_args ')'
+   20          | ID single_arg
+
+   21 func_args: func_arg
+   22          | func_args ',' func_arg
+
+   23 func_arg: TRUE
+   24         | FALSE
+   25         | STRING
+   26         | ID
+   27         | NUM
+   28         | table
+
+   29 single_arg: STRING
+   30           | table
+
+   31 table: '{' exprs '}'
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'!' (33) 17
+'(' (40) 18 19
+')' (41) 18 19
+',' (44) 22
+'-' (45) 16
+'=' (61) 9 10
+'{' (123) 31
+'}' (125) 31
+error (256)
+AND (258)
+BREAK (259)
+DO (260)
+ELSE (261)
+ELSEIF (262)
+END (263)
+FALSE (264) 14 24
+GOTO (265)
+FOR (266)
+FUNCTION (267)
+IF (268)
+IN (269)
+LOCAL (270)
+NIL (271) 15
+NOT (272)
+OR (273)
+REPEAT (274)
+RETURN (275)
+THEN (276)
+TRUE (277) 13 23
+UNTIL (278)
+WHILE (279)
+ID (280) 9 10 19 20 26
+NUM (281) 11 27
+STRING (282) 12 25 29
+
+
+Nonterminals, with rules where they appear
+
+$accept (36)
+    on left: 0
+program (37)
+    on left: 1, on right: 0
+ops (38)
+    on left: 2 3, on right: 1 3
+op (39)
+    on left: 4 5, on right: 2 3
+exprs (40)
+    on left: 6 7 8, on right: 7 31
+expr (41)
+    on left: 9 10, on right: 4 6 7 18
+value (42)
+    on left: 11 12 13 14 15 16 17 18, on right: 10 16 17
+func_call (43)
+    on left: 19 20, on right: 5
+func_args (44)
+    on left: 21 22, on right: 19 22
+func_arg (45)
+    on left: 23 24 25 26 27 28, on right: 21 22
+single_arg (46)
+    on left: 29 30, on right: 20
+table (47)
+    on left: 31, on right: 28 30
+
+
+State 0
+
+    0 $accept: . program $end
+
+    ID  shift, and go to state 1
+
+    program    go to state 2
+    ops        go to state 3
+    op         go to state 4
+    expr       go to state 5
+    func_call  go to state 6
+
+
+State 1
+
+    9 expr: ID . '=' ID
+   10     | ID . '=' value
+   19 func_call: ID . '(' func_args ')'
+   20          | ID . single_arg
+
+    STRING  shift, and go to state 7
+    '='     shift, and go to state 8
+    '('     shift, and go to state 9
+    '{'     shift, and go to state 10
+
+    single_arg  go to state 11
+    table       go to state 12
+
+
+State 2
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 13
+
+
+State 3
+
+    1 program: ops .
+    3 ops: ops . op
+
+    ID  shift, and go to state 1
+
+    $default  reduce using rule 1 (program)
+
+    op         go to state 14
+    expr       go to state 5
+    func_call  go to state 6
+
+
+State 4
+
+    2 ops: op .
+
+    $default  reduce using rule 2 (ops)
+
+
+State 5
+
+    4 op: expr .
+
+    $default  reduce using rule 4 (op)
+
+
+State 6
+
+    5 op: func_call .
+
+    $default  reduce using rule 5 (op)
+
+
+State 7
+
+   29 single_arg: STRING .
+
+    $default  reduce using rule 29 (single_arg)
+
+
+State 8
+
+    9 expr: ID '=' . ID
+   10     | ID '=' . value
+
+    FALSE   shift, and go to state 15
+    NIL     shift, and go to state 16
+    TRUE    shift, and go to state 17
+    ID      shift, and go to state 18
+    NUM     shift, and go to state 19
+    STRING  shift, and go to state 20
+    '-'     shift, and go to state 21
+    '!'     shift, and go to state 22
+    '('     shift, and go to state 23
+
+    value  go to state 24
+
+
+State 9
+
+   19 func_call: ID '(' . func_args ')'
+
+    FALSE   shift, and go to state 25
+    TRUE    shift, and go to state 26
+    ID      shift, and go to state 27
+    NUM     shift, and go to state 28
+    STRING  shift, and go to state 29
+    '{'     shift, and go to state 10
+
+    func_args  go to state 30
+    func_arg   go to state 31
+    table      go to state 32
+
+
+State 10
+
+   31 table: '{' . exprs '}'
+
+    ID  shift, and go to state 33
+
+    ID        [reduce using rule 8 (exprs)]
+    $default  reduce using rule 8 (exprs)
+
+    exprs  go to state 34
+    expr   go to state 35
+
+
+State 11
+
+   20 func_call: ID single_arg .
+
+    $default  reduce using rule 20 (func_call)
+
+
+State 12
+
+   30 single_arg: table .
+
+    $default  reduce using rule 30 (single_arg)
+
+
+State 13
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 14
+
+    3 ops: ops op .
+
+    $default  reduce using rule 3 (ops)
+
+
+State 15
+
+   14 value: FALSE .
+
+    $default  reduce using rule 14 (value)
+
+
+State 16
+
+   15 value: NIL .
+
+    $default  reduce using rule 15 (value)
+
+
+State 17
+
+   13 value: TRUE .
+
+    $default  reduce using rule 13 (value)
+
+
+State 18
+
+    9 expr: ID '=' ID .
+
+    $default  reduce using rule 9 (expr)
+
+
+State 19
+
+   11 value: NUM .
+
+    $default  reduce using rule 11 (value)
+
+
+State 20
+
+   12 value: STRING .
+
+    $default  reduce using rule 12 (value)
+
+
+State 21
+
+   16 value: '-' . value
+
+    FALSE   shift, and go to state 15
+    NIL     shift, and go to state 16
+    TRUE    shift, and go to state 17
+    NUM     shift, and go to state 19
+    STRING  shift, and go to state 20
+    '-'     shift, and go to state 21
+    '!'     shift, and go to state 22
+    '('     shift, and go to state 23
+
+    value  go to state 36
+
+
+State 22
+
+   17 value: '!' . value
+
+    FALSE   shift, and go to state 15
+    NIL     shift, and go to state 16
+    TRUE    shift, and go to state 17
+    NUM     shift, and go to state 19
+    STRING  shift, and go to state 20
+    '-'     shift, and go to state 21
+    '!'     shift, and go to state 22
+    '('     shift, and go to state 23
+
+    value  go to state 37
+
+
+State 23
+
+   18 value: '(' . expr ')'
+
+    ID  shift, and go to state 33
+
+    expr  go to state 38
+
+
+State 24
+
+   10 expr: ID '=' value .
+
+    $default  reduce using rule 10 (expr)
+
+
+State 25
+
+   24 func_arg: FALSE .
+
+    $default  reduce using rule 24 (func_arg)
+
+
+State 26
+
+   23 func_arg: TRUE .
+
+    $default  reduce using rule 23 (func_arg)
+
+
+State 27
+
+   26 func_arg: ID .
+
+    $default  reduce using rule 26 (func_arg)
+
+
+State 28
+
+   27 func_arg: NUM .
+
+    $default  reduce using rule 27 (func_arg)
+
+
+State 29
+
+   25 func_arg: STRING .
+
+    $default  reduce using rule 25 (func_arg)
+
+
+State 30
+
+   19 func_call: ID '(' func_args . ')'
+   22 func_args: func_args . ',' func_arg
+
+    ')'  shift, and go to state 39
+    ','  shift, and go to state 40
+
+
+State 31
+
+   21 func_args: func_arg .
+
+    $default  reduce using rule 21 (func_args)
+
+
+State 32
+
+   28 func_arg: table .
+
+    $default  reduce using rule 28 (func_arg)
+
+
+State 33
+
+    9 expr: ID . '=' ID
+   10     | ID . '=' value
+
+    '='  shift, and go to state 8
+
+
+State 34
+
+    7 exprs: exprs . expr
+   31 table: '{' exprs . '}'
+
+    ID   shift, and go to state 33
+    '}'  shift, and go to state 41
+
+    expr  go to state 42
+
+
+State 35
+
+    6 exprs: expr .
+
+    $default  reduce using rule 6 (exprs)
+
+
+State 36
+
+   16 value: '-' value .
+
+    $default  reduce using rule 16 (value)
+
+
+State 37
+
+   17 value: '!' value .
+
+    $default  reduce using rule 17 (value)
+
+
+State 38
+
+   18 value: '(' expr . ')'
+
+    ')'  shift, and go to state 43
+
+
+State 39
+
+   19 func_call: ID '(' func_args ')' .
+
+    $default  reduce using rule 19 (func_call)
+
+
+State 40
+
+   22 func_args: func_args ',' . func_arg
+
+    FALSE   shift, and go to state 25
+    TRUE    shift, and go to state 26
+    ID      shift, and go to state 27
+    NUM     shift, and go to state 28
+    STRING  shift, and go to state 29
+    '{'     shift, and go to state 10
+
+    func_arg  go to state 44
+    table     go to state 32
+
+
+State 41
+
+   31 table: '{' exprs '}' .
+
+    $default  reduce using rule 31 (table)
+
+
+State 42
+
+    7 exprs: exprs expr .
+
+    $default  reduce using rule 7 (exprs)
+
+
+State 43
+
+   18 value: '(' expr ')' .
+
+    $default  reduce using rule 18 (value)
+
+
+State 44
+
+   22 func_args: func_args ',' func_arg .
+
+    $default  reduce using rule 22 (func_args)

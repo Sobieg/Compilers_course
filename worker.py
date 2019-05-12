@@ -1,6 +1,6 @@
 import sys
 import subprocess
-from filecmp import cmp, clear_cache
+import filecmp
 
 
 prog = "./a.out"
@@ -26,10 +26,9 @@ for line in data:
 		output.write(newline)
 
 output.close()
-clear_cache()
 
-if not cmp(outfile, etfile, False):
-	log = open("errors.log", "w+")
+if not filecmp.cmp(outfile, etfile, False):
+	log = open("errors.log", "a+")
 	log.write(name + "\n")
 	log.close()
 

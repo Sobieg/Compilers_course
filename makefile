@@ -31,7 +31,7 @@ y.tab.c: lua_syntax_check.yacc
 git:
 	$(GIT) checkout everymake-commit
 	$(GIT) add .
-	$(GIT) commit -am "$(shell date)"
+	$(GIT) commit -am "make commit on $(shell date)"
 
 compile: lex.yy.c y.tab.c y.tab.h git
 	$(CXX) lex.yy.c y.tab.c

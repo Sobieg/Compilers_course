@@ -33,9 +33,6 @@ git:
 	$(GIT) add .
 	$(GIT) commit -am "$(shell date)"
 
-test:
-	$(DATE) + "%y.%m.%d %H:%M:%S"
-
 compile: lex.yy.c y.tab.c y.tab.h git
 	$(CXX) lex.yy.c y.tab.c
 

@@ -30,7 +30,7 @@ y.tab.c: lua_syntax_check.yacc
 git:
 	$(GIT) checkout master
 	$(GIT) add .
-	$(GIT) commit -am date
+	$(GIT) commit -am "test"
 
 compile: lex.yy.c y.tab.c y.tab.h git
 	$(CXX) lex.yy.c y.tab.c

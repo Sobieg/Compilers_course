@@ -9,6 +9,7 @@ TESTSDIR=tests\\
 ETDIR=etalon\\
 GIT=git
 GITFLAGS=-am
+DATE=date
 
 TARGET=compile
 
@@ -30,7 +31,7 @@ y.tab.c: lua_syntax_check.yacc
 git:
 	$(GIT) checkout master
 	$(GIT) add .
-	$(GIT) commit -am "test"
+	$(GIT) commit -am $(DATE)
 
 compile: lex.yy.c y.tab.c y.tab.h git
 	$(CXX) lex.yy.c y.tab.c

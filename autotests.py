@@ -1,5 +1,6 @@
 from glob import glob
 import subprocess
+import filecmp
 
 
 prog = "./a.out"
@@ -14,8 +15,5 @@ for file in files:
 	proc = subprocess.Popen(args)
 	processes.append(proc)
 
-# for proc in processes:
-# 	data = proc.communicate()
-# 	for line in data:
-# 		if (line):
-# 			print(line.decode("utf-8"))
+for proc in processes:
+	proc.wait()

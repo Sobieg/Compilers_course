@@ -1,536 +1,3251 @@
 Terminals unused in grammar
 
-   AND
    BREAK
-   DO
-   ELSE
-   ELSEIF
-   END
    GOTO
-   FOR
-   FUNCTION
-   IF
-   IN
-   LOCAL
-   NOT
-   OR
-   REPEAT
-   RETURN
-   THEN
-   UNTIL
-   WHILE
+   FID
+   FNAME
+   CONC
 
 
-State 10 conflicts: 1 shift/reduce
+State 6 conflicts: 2 shift/reduce
+State 32 conflicts: 1 shift/reduce
+State 44 conflicts: 1 shift/reduce
+State 114 conflicts: 2 reduce/reduce
+State 116 conflicts: 1 shift/reduce
+State 117 conflicts: 1 shift/reduce
 
 
 Grammar
 
     0 $accept: program $end
 
-    1 program: ops
+    1 program: list_of_statements
 
-    2 ops: op
-    3    | ops op
+    2 list_of_statements: statement
+    3                   | list_of_statements statement
 
-    4 op: expr
-    5   | func_call
+    4 statement: list_of_id '=' list_of_assignable
+    5          | LOCAL list_of_id '=' list_of_assignable
+    6          | LOCAL list_of_id ';'
+    7          | LOCAL list_of_id
+    8          | func_def
+    9          | func_call
+   10          | RETURN func_returnable
+   11          | IF expr THEN list_of_statements elseif_block
+   12          | WHILE expr DO list_of_statements END
+   13          | REPEAT list_of_statements UNTIL expr
+   14          | FOR ID '=' list_of_assignable DO list_of_statements END
+   15          | FOR list_of_id IN assignable DO list_of_statements END
 
-    6 exprs: expr
-    7      | exprs expr
-    8      | %empty
+   16 elseif_block: END
+   17             | ELSE list_of_statements END
+   18             | ELSEIF expr THEN list_of_statements elseif_block
 
-    9 expr: ID '=' ID
-   10     | ID '=' value
+   19 list_of_id: ID
+   20           | list_of_id ',' ID
 
-   11 value: NUM
-   12      | STRING
-   13      | TRUE
-   14      | FALSE
-   15      | NIL
-   16      | '-' value
-   17      | '!' value
-   18      | '(' expr ')'
+   21 list_of_assignable: list_of_assignable ',' expr
+   22                   | expr
 
-   19 func_call: ID '(' func_args ')'
-   20          | ID single_arg
+   23 list_of_assignable_without_func_def: list_of_assignable_without_func_def ',' expr_without_func_def
+   24                                    | expr_without_func_def
 
-   21 func_args: func_arg
-   22          | func_args ',' func_arg
+   25 expr_without_func_def: NOT expr_without_func_def
+   26                      | assignable_without_func_def EQ expr_without_func_def
+   27                      | assignable_without_func_def NE expr_without_func_def
+   28                      | assignable_without_func_def LE expr_without_func_def
+   29                      | assignable_without_func_def GE expr_without_func_def
+   30                      | assignable_without_func_def '<' expr_without_func_def
+   31                      | assignable_without_func_def '>' expr_without_func_def
+   32                      | assignable_without_func_def AND expr_without_func_def
+   33                      | assignable_without_func_def OR expr_without_func_def
+   34                      | assignable_without_func_def ',' expr_without_func_def
+   35                      | assignable_without_func_def '+' expr_without_func_def
+   36                      | assignable_without_func_def '-' expr_without_func_def
+   37                      | assignable_without_func_def '*' expr_without_func_def
+   38                      | assignable_without_func_def '/' expr_without_func_def
+   39                      | assignable_without_func_def '%' expr_without_func_def
+   40                      | '(' expr_without_func_def ')'
+   41                      | assignable_without_func_def
 
-   23 func_arg: TRUE
-   24         | FALSE
-   25         | STRING
-   26         | ID
-   27         | NUM
-   28         | table
+   42 assignable_without_func_def: ID
+   43                            | NUM
+   44                            | '-' NUM
+   45                            | STRING
+   46                            | NIL
+   47                            | TRUE
+   48                            | FALSE
+   49                            | func_call
+   50                            | table_index
+   51                            | table_def
 
-   29 single_arg: STRING
-   30           | table
+   52 table_index: ID '[' expr ']'
 
-   31 table: '{' exprs '}'
+   53 expr: NOT expr
+   54     | assignable EQ expr
+   55     | assignable NE expr
+   56     | assignable LE expr
+   57     | assignable GE expr
+   58     | assignable '<' expr
+   59     | assignable '>' expr
+   60     | assignable AND expr
+   61     | assignable OR expr
+   62     | assignable ',' expr
+   63     | assignable '+' expr
+   64     | assignable '-' expr
+   65     | assignable '*' expr
+   66     | assignable '/' expr
+   67     | assignable '%' expr
+   68     | '(' expr ')'
+   69     | assignable
+
+   70 assignable: assignable_without_func_def
+   71           | nameles_func_def
+
+   72 func_call: ID '(' list_of_assignable ')'
+   73          | ID '(' DOTS ')'
+   74          | ID '(' ')'
+   75          | ID table_def
+   76          | ID STRING
+
+   77 table_def: '{' '}'
+   78          | '{' list_of_assignable '}'
+   79          | '{' assign_list '}'
+
+   80 assign_list: table_assign
+   81            | assign_list ',' table_assign
+
+   82 table_assign: ID '=' assignable
+   83             | '[' expr ']' '=' assignable
+
+   84 func_def: FUNCTION ID '(' list_of_func_arg ')' list_of_statements END
+   85         | LOCAL FUNCTION ID '(' list_of_func_arg ')' list_of_statements END
+   86         | FUNCTION ID '(' ')' list_of_statements END
+   87         | LOCAL FUNCTION ID '(' ')' list_of_statements END
+   88         | FUNCTION ID '(' ')' END
+   89         | LOCAL FUNCTION ID '(' ')' END
+
+   90 nameles_func_def: FUNCTION '(' ')' list_of_statements END
+   91                 | FUNCTION '(' list_of_func_arg ')' list_of_statements END
+
+   92 list_of_func_arg: func_arg
+   93                 | list_of_func_arg ',' func_arg
+
+   94 func_returnable: list_of_assignable_without_func_def
+   95                | nameles_func_def
+   96                | %empty
+
+   97 func_arg: list_of_assignable
+   98         | list_of_id
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'!' (33) 17
-'(' (40) 18 19
-')' (41) 18 19
-',' (44) 22
-'-' (45) 16
-'=' (61) 9 10
-'{' (123) 31
-'}' (125) 31
+'%' (37) 39 67
+'(' (40) 40 68 72 73 74 84 85 86 87 88 89 90 91
+')' (41) 40 68 72 73 74 84 85 86 87 88 89 90 91
+'*' (42) 37 65
+'+' (43) 35 63
+',' (44) 20 21 23 34 62 81 93
+'-' (45) 36 44 64
+'/' (47) 38 66
+';' (59) 6
+'<' (60) 30 58
+'=' (61) 4 5 14 82 83
+'>' (62) 31 59
+'[' (91) 52 83
+']' (93) 52 83
+'{' (123) 77 78 79
+'}' (125) 77 78 79
 error (256)
-AND (258)
+AND (258) 32 60
 BREAK (259)
-DO (260)
-ELSE (261)
-ELSEIF (262)
-END (263)
-FALSE (264) 14 24
+DO (260) 12 14 15
+ELSE (261) 17
+ELSEIF (262) 18
+END (263) 12 14 15 16 17 84 85 86 87 88 89 90 91
+FALSE (264) 48
 GOTO (265)
-FOR (266)
-FUNCTION (267)
-IF (268)
-IN (269)
-LOCAL (270)
-NIL (271) 15
-NOT (272)
-OR (273)
-REPEAT (274)
-RETURN (275)
-THEN (276)
-TRUE (277) 13 23
-UNTIL (278)
-WHILE (279)
-ID (280) 9 10 19 20 26
-NUM (281) 11 27
-STRING (282) 12 25 29
+FOR (266) 14 15
+FUNCTION (267) 84 85 86 87 88 89 90 91
+IF (268) 11
+IN (269) 15
+LOCAL (270) 5 6 7 85 87 89
+NIL (271) 46
+NOT (272) 25 53
+OR (273) 33 61
+REPEAT (274) 13
+RETURN (275) 10
+THEN (276) 11 18
+TRUE (277) 47
+UNTIL (278) 13
+WHILE (279) 12
+ID (280) 14 19 20 42 52 72 73 74 75 76 82 84 85 86 87 88 89
+FID (281)
+NUM (282) 43 44
+STRING (283) 45 76
+FNAME (284)
+NE (285) 27 55
+EQ (286) 26 54
+LE (287) 28 56
+GE (288) 29 57
+CONC (289)
+DOTS (290) 73
 
 
 Nonterminals, with rules where they appear
 
-$accept (36)
+$accept (52)
     on left: 0
-program (37)
+program (53)
     on left: 1, on right: 0
-ops (38)
-    on left: 2 3, on right: 1 3
-op (39)
-    on left: 4 5, on right: 2 3
-exprs (40)
-    on left: 6 7 8, on right: 7 31
-expr (41)
-    on left: 9 10, on right: 4 6 7 18
-value (42)
-    on left: 11 12 13 14 15 16 17 18, on right: 10 16 17
-func_call (43)
-    on left: 19 20, on right: 5
-func_args (44)
-    on left: 21 22, on right: 19 22
-func_arg (45)
-    on left: 23 24 25 26 27 28, on right: 21 22
-single_arg (46)
-    on left: 29 30, on right: 20
-table (47)
-    on left: 31, on right: 28 30
+list_of_statements (54)
+    on left: 2 3, on right: 1 3 11 12 13 14 15 17 18 84 85 86 87 90
+    91
+statement (55)
+    on left: 4 5 6 7 8 9 10 11 12 13 14 15, on right: 2 3
+elseif_block (56)
+    on left: 16 17 18, on right: 11 18
+list_of_id (57)
+    on left: 19 20, on right: 4 5 6 7 15 20 98
+list_of_assignable (58)
+    on left: 21 22, on right: 4 5 14 21 72 78 97
+list_of_assignable_without_func_def (59)
+    on left: 23 24, on right: 23 94
+expr_without_func_def (60)
+    on left: 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41, on right:
+    23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
+assignable_without_func_def (61)
+    on left: 42 43 44 45 46 47 48 49 50 51, on right: 26 27 28 29 30
+    31 32 33 34 35 36 37 38 39 41 70
+table_index (62)
+    on left: 52, on right: 50
+expr (63)
+    on left: 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69, on right:
+    11 12 13 18 21 22 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66
+    67 68 83
+assignable (64)
+    on left: 70 71, on right: 15 54 55 56 57 58 59 60 61 62 63 64 65
+    66 67 69 82 83
+func_call (65)
+    on left: 72 73 74 75 76, on right: 9 49
+table_def (66)
+    on left: 77 78 79, on right: 51 75
+assign_list (67)
+    on left: 80 81, on right: 79 81
+table_assign (68)
+    on left: 82 83, on right: 80 81
+func_def (69)
+    on left: 84 85 86 87 88 89, on right: 8
+nameles_func_def (70)
+    on left: 90 91, on right: 71 95
+list_of_func_arg (71)
+    on left: 92 93, on right: 84 85 91 93
+func_returnable (72)
+    on left: 94 95 96, on right: 10
+func_arg (73)
+    on left: 97 98, on right: 92 93
 
 
 State 0
 
     0 $accept: . program $end
 
-    ID  shift, and go to state 1
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
 
-    program    go to state 2
-    ops        go to state 3
-    op         go to state 4
-    expr       go to state 5
-    func_call  go to state 6
+    program             go to state 9
+    list_of_statements  go to state 10
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
 
 
 State 1
 
-    9 expr: ID . '=' ID
-   10     | ID . '=' value
-   19 func_call: ID . '(' func_args ')'
-   20          | ID . single_arg
+   14 statement: FOR . ID '=' list_of_assignable DO list_of_statements END
+   15          | FOR . list_of_id IN assignable DO list_of_statements END
 
-    STRING  shift, and go to state 7
-    '='     shift, and go to state 8
-    '('     shift, and go to state 9
-    '{'     shift, and go to state 10
+    ID  shift, and go to state 15
 
-    single_arg  go to state 11
-    table       go to state 12
+    list_of_id  go to state 16
 
 
 State 2
 
-    0 $accept: program . $end
+   84 func_def: FUNCTION . ID '(' list_of_func_arg ')' list_of_statements END
+   86         | FUNCTION . ID '(' ')' list_of_statements END
+   88         | FUNCTION . ID '(' ')' END
 
-    $end  shift, and go to state 13
+    ID  shift, and go to state 17
 
 
 State 3
 
-    1 program: ops .
-    3 ops: ops . op
+   11 statement: IF . expr THEN list_of_statements elseif_block
 
-    ID  shift, and go to state 1
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
 
-    $default  reduce using rule 1 (program)
-
-    op         go to state 14
-    expr       go to state 5
-    func_call  go to state 6
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 31
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
 
 
 State 4
 
-    2 ops: op .
+    5 statement: LOCAL . list_of_id '=' list_of_assignable
+    6          | LOCAL . list_of_id ';'
+    7          | LOCAL . list_of_id
+   85 func_def: LOCAL . FUNCTION ID '(' list_of_func_arg ')' list_of_statements END
+   87         | LOCAL . FUNCTION ID '(' ')' list_of_statements END
+   89         | LOCAL . FUNCTION ID '(' ')' END
 
-    $default  reduce using rule 2 (ops)
+    FUNCTION  shift, and go to state 36
+    ID        shift, and go to state 37
+
+    list_of_id  go to state 38
 
 
 State 5
 
-    4 op: expr .
+   13 statement: REPEAT . list_of_statements UNTIL expr
 
-    $default  reduce using rule 4 (op)
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    list_of_statements  go to state 39
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
 
 
 State 6
 
-    5 op: func_call .
+   10 statement: RETURN . func_returnable
 
-    $default  reduce using rule 5 (op)
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 40
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 41
+    '{'       shift, and go to state 28
+
+    FUNCTION  [reduce using rule 96 (func_returnable)]
+    ID        [reduce using rule 96 (func_returnable)]
+    $default  reduce using rule 96 (func_returnable)
+
+    list_of_assignable_without_func_def  go to state 42
+    expr_without_func_def                go to state 43
+    assignable_without_func_def          go to state 44
+    table_index                          go to state 30
+    func_call                            go to state 33
+    table_def                            go to state 34
+    nameles_func_def                     go to state 45
+    func_returnable                      go to state 46
 
 
 State 7
 
-   29 single_arg: STRING .
+   12 statement: WHILE . expr DO list_of_statements END
 
-    $default  reduce using rule 29 (single_arg)
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 47
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
 
 
 State 8
 
-    9 expr: ID '=' . ID
-   10     | ID '=' . value
+   19 list_of_id: ID .
+   72 func_call: ID . '(' list_of_assignable ')'
+   73          | ID . '(' DOTS ')'
+   74          | ID . '(' ')'
+   75          | ID . table_def
+   76          | ID . STRING
 
-    FALSE   shift, and go to state 15
-    NIL     shift, and go to state 16
-    TRUE    shift, and go to state 17
-    ID      shift, and go to state 18
-    NUM     shift, and go to state 19
-    STRING  shift, and go to state 20
-    '-'     shift, and go to state 21
-    '!'     shift, and go to state 22
-    '('     shift, and go to state 23
+    STRING  shift, and go to state 48
+    '('     shift, and go to state 49
+    '{'     shift, and go to state 28
 
-    value  go to state 24
+    $default  reduce using rule 19 (list_of_id)
+
+    table_def  go to state 50
 
 
 State 9
 
-   19 func_call: ID '(' . func_args ')'
+    0 $accept: program . $end
 
-    FALSE   shift, and go to state 25
-    TRUE    shift, and go to state 26
-    ID      shift, and go to state 27
-    NUM     shift, and go to state 28
-    STRING  shift, and go to state 29
-    '{'     shift, and go to state 10
-
-    func_args  go to state 30
-    func_arg   go to state 31
-    table      go to state 32
+    $end  shift, and go to state 51
 
 
 State 10
 
-   31 table: '{' . exprs '}'
+    1 program: list_of_statements .
+    3 list_of_statements: list_of_statements . statement
 
-    ID  shift, and go to state 33
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
 
-    ID        [reduce using rule 8 (exprs)]
-    $default  reduce using rule 8 (exprs)
+    $default  reduce using rule 1 (program)
 
-    exprs  go to state 34
-    expr   go to state 35
+    statement   go to state 52
+    list_of_id  go to state 12
+    func_call   go to state 13
+    func_def    go to state 14
 
 
 State 11
 
-   20 func_call: ID single_arg .
+    2 list_of_statements: statement .
 
-    $default  reduce using rule 20 (func_call)
+    $default  reduce using rule 2 (list_of_statements)
 
 
 State 12
 
-   30 single_arg: table .
+    4 statement: list_of_id . '=' list_of_assignable
+   20 list_of_id: list_of_id . ',' ID
 
-    $default  reduce using rule 30 (single_arg)
+    '='  shift, and go to state 53
+    ','  shift, and go to state 54
 
 
 State 13
+
+    9 statement: func_call .
+
+    $default  reduce using rule 9 (statement)
+
+
+State 14
+
+    8 statement: func_def .
+
+    $default  reduce using rule 8 (statement)
+
+
+State 15
+
+   14 statement: FOR ID . '=' list_of_assignable DO list_of_statements END
+   19 list_of_id: ID .
+
+    '='  shift, and go to state 55
+
+    $default  reduce using rule 19 (list_of_id)
+
+
+State 16
+
+   15 statement: FOR list_of_id . IN assignable DO list_of_statements END
+   20 list_of_id: list_of_id . ',' ID
+
+    IN   shift, and go to state 56
+    ','  shift, and go to state 54
+
+
+State 17
+
+   84 func_def: FUNCTION ID . '(' list_of_func_arg ')' list_of_statements END
+   86         | FUNCTION ID . '(' ')' list_of_statements END
+   88         | FUNCTION ID . '(' ')' END
+
+    '('  shift, and go to state 57
+
+
+State 18
+
+   48 assignable_without_func_def: FALSE .
+
+    $default  reduce using rule 48 (assignable_without_func_def)
+
+
+State 19
+
+   90 nameles_func_def: FUNCTION . '(' ')' list_of_statements END
+   91                 | FUNCTION . '(' list_of_func_arg ')' list_of_statements END
+
+    '('  shift, and go to state 58
+
+
+State 20
+
+   46 assignable_without_func_def: NIL .
+
+    $default  reduce using rule 46 (assignable_without_func_def)
+
+
+State 21
+
+   53 expr: NOT . expr
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 59
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 22
+
+   47 assignable_without_func_def: TRUE .
+
+    $default  reduce using rule 47 (assignable_without_func_def)
+
+
+State 23
+
+   42 assignable_without_func_def: ID .
+   52 table_index: ID . '[' expr ']'
+   72 func_call: ID . '(' list_of_assignable ')'
+   73          | ID . '(' DOTS ')'
+   74          | ID . '(' ')'
+   75          | ID . table_def
+   76          | ID . STRING
+
+    STRING  shift, and go to state 48
+    '('     shift, and go to state 49
+    '['     shift, and go to state 60
+    '{'     shift, and go to state 28
+
+    $default  reduce using rule 42 (assignable_without_func_def)
+
+    table_def  go to state 50
+
+
+State 24
+
+   43 assignable_without_func_def: NUM .
+
+    $default  reduce using rule 43 (assignable_without_func_def)
+
+
+State 25
+
+   45 assignable_without_func_def: STRING .
+
+    $default  reduce using rule 45 (assignable_without_func_def)
+
+
+State 26
+
+   44 assignable_without_func_def: '-' . NUM
+
+    NUM  shift, and go to state 61
+
+
+State 27
+
+   68 expr: '(' . expr ')'
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 62
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 28
+
+   77 table_def: '{' . '}'
+   78          | '{' . list_of_assignable '}'
+   79          | '{' . assign_list '}'
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 63
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '['       shift, and go to state 64
+    '{'       shift, and go to state 28
+    '}'       shift, and go to state 65
+
+    list_of_assignable           go to state 66
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 67
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    assign_list                  go to state 68
+    table_assign                 go to state 69
+    nameles_func_def             go to state 35
+
+
+State 29
+
+   70 assignable: assignable_without_func_def .
+
+    $default  reduce using rule 70 (assignable)
+
+
+State 30
+
+   50 assignable_without_func_def: table_index .
+
+    $default  reduce using rule 50 (assignable_without_func_def)
+
+
+State 31
+
+   11 statement: IF expr . THEN list_of_statements elseif_block
+
+    THEN  shift, and go to state 70
+
+
+State 32
+
+   54 expr: assignable . EQ expr
+   55     | assignable . NE expr
+   56     | assignable . LE expr
+   57     | assignable . GE expr
+   58     | assignable . '<' expr
+   59     | assignable . '>' expr
+   60     | assignable . AND expr
+   61     | assignable . OR expr
+   62     | assignable . ',' expr
+   63     | assignable . '+' expr
+   64     | assignable . '-' expr
+   65     | assignable . '*' expr
+   66     | assignable . '/' expr
+   67     | assignable . '%' expr
+   69     | assignable .
+
+    AND  shift, and go to state 71
+    OR   shift, and go to state 72
+    NE   shift, and go to state 73
+    EQ   shift, and go to state 74
+    LE   shift, and go to state 75
+    GE   shift, and go to state 76
+    ','  shift, and go to state 77
+    '<'  shift, and go to state 78
+    '>'  shift, and go to state 79
+    '+'  shift, and go to state 80
+    '-'  shift, and go to state 81
+    '*'  shift, and go to state 82
+    '/'  shift, and go to state 83
+    '%'  shift, and go to state 84
+
+    ','       [reduce using rule 69 (expr)]
+    $default  reduce using rule 69 (expr)
+
+
+State 33
+
+   49 assignable_without_func_def: func_call .
+
+    $default  reduce using rule 49 (assignable_without_func_def)
+
+
+State 34
+
+   51 assignable_without_func_def: table_def .
+
+    $default  reduce using rule 51 (assignable_without_func_def)
+
+
+State 35
+
+   71 assignable: nameles_func_def .
+
+    $default  reduce using rule 71 (assignable)
+
+
+State 36
+
+   85 func_def: LOCAL FUNCTION . ID '(' list_of_func_arg ')' list_of_statements END
+   87         | LOCAL FUNCTION . ID '(' ')' list_of_statements END
+   89         | LOCAL FUNCTION . ID '(' ')' END
+
+    ID  shift, and go to state 85
+
+
+State 37
+
+   19 list_of_id: ID .
+
+    $default  reduce using rule 19 (list_of_id)
+
+
+State 38
+
+    5 statement: LOCAL list_of_id . '=' list_of_assignable
+    6          | LOCAL list_of_id . ';'
+    7          | LOCAL list_of_id .
+   20 list_of_id: list_of_id . ',' ID
+
+    '='  shift, and go to state 86
+    ';'  shift, and go to state 87
+    ','  shift, and go to state 54
+
+    $default  reduce using rule 7 (statement)
+
+
+State 39
+
+    3 list_of_statements: list_of_statements . statement
+   13 statement: REPEAT list_of_statements . UNTIL expr
+
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    UNTIL     shift, and go to state 88
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement   go to state 52
+    list_of_id  go to state 12
+    func_call   go to state 13
+    func_def    go to state 14
+
+
+State 40
+
+   25 expr_without_func_def: NOT . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 89
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 41
+
+   40 expr_without_func_def: '(' . expr_without_func_def ')'
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 90
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 42
+
+   23 list_of_assignable_without_func_def: list_of_assignable_without_func_def . ',' expr_without_func_def
+   94 func_returnable: list_of_assignable_without_func_def .
+
+    ','  shift, and go to state 91
+
+    $default  reduce using rule 94 (func_returnable)
+
+
+State 43
+
+   24 list_of_assignable_without_func_def: expr_without_func_def .
+
+    $default  reduce using rule 24 (list_of_assignable_without_func_def)
+
+
+State 44
+
+   26 expr_without_func_def: assignable_without_func_def . EQ expr_without_func_def
+   27                      | assignable_without_func_def . NE expr_without_func_def
+   28                      | assignable_without_func_def . LE expr_without_func_def
+   29                      | assignable_without_func_def . GE expr_without_func_def
+   30                      | assignable_without_func_def . '<' expr_without_func_def
+   31                      | assignable_without_func_def . '>' expr_without_func_def
+   32                      | assignable_without_func_def . AND expr_without_func_def
+   33                      | assignable_without_func_def . OR expr_without_func_def
+   34                      | assignable_without_func_def . ',' expr_without_func_def
+   35                      | assignable_without_func_def . '+' expr_without_func_def
+   36                      | assignable_without_func_def . '-' expr_without_func_def
+   37                      | assignable_without_func_def . '*' expr_without_func_def
+   38                      | assignable_without_func_def . '/' expr_without_func_def
+   39                      | assignable_without_func_def . '%' expr_without_func_def
+   41                      | assignable_without_func_def .
+
+    AND  shift, and go to state 92
+    OR   shift, and go to state 93
+    NE   shift, and go to state 94
+    EQ   shift, and go to state 95
+    LE   shift, and go to state 96
+    GE   shift, and go to state 97
+    ','  shift, and go to state 98
+    '<'  shift, and go to state 99
+    '>'  shift, and go to state 100
+    '+'  shift, and go to state 101
+    '-'  shift, and go to state 102
+    '*'  shift, and go to state 103
+    '/'  shift, and go to state 104
+    '%'  shift, and go to state 105
+
+    ','       [reduce using rule 41 (expr_without_func_def)]
+    $default  reduce using rule 41 (expr_without_func_def)
+
+
+State 45
+
+   95 func_returnable: nameles_func_def .
+
+    $default  reduce using rule 95 (func_returnable)
+
+
+State 46
+
+   10 statement: RETURN func_returnable .
+
+    $default  reduce using rule 10 (statement)
+
+
+State 47
+
+   12 statement: WHILE expr . DO list_of_statements END
+
+    DO  shift, and go to state 106
+
+
+State 48
+
+   76 func_call: ID STRING .
+
+    $default  reduce using rule 76 (func_call)
+
+
+State 49
+
+   72 func_call: ID '(' . list_of_assignable ')'
+   73          | ID '(' . DOTS ')'
+   74          | ID '(' . ')'
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    DOTS      shift, and go to state 107
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    ')'       shift, and go to state 108
+    '{'       shift, and go to state 28
+
+    list_of_assignable           go to state 109
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 67
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 50
+
+   75 func_call: ID table_def .
+
+    $default  reduce using rule 75 (func_call)
+
+
+State 51
 
     0 $accept: program $end .
 
     $default  accept
 
 
-State 14
+State 52
+
+    3 list_of_statements: list_of_statements statement .
+
+    $default  reduce using rule 3 (list_of_statements)
+
+
+State 53
+
+    4 statement: list_of_id '=' . list_of_assignable
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    list_of_assignable           go to state 110
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 67
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 54
+
+   20 list_of_id: list_of_id ',' . ID
+
+    ID  shift, and go to state 111
+
+
+State 55
+
+   14 statement: FOR ID '=' . list_of_assignable DO list_of_statements END
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    list_of_assignable           go to state 112
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 67
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 56
+
+   15 statement: FOR list_of_id IN . assignable DO list_of_statements END
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    assignable                   go to state 113
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 57
+
+   84 func_def: FUNCTION ID '(' . list_of_func_arg ')' list_of_statements END
+   86         | FUNCTION ID '(' . ')' list_of_statements END
+   88         | FUNCTION ID '(' . ')' END
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 114
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    ')'       shift, and go to state 115
+    '{'       shift, and go to state 28
+
+    list_of_id                   go to state 116
+    list_of_assignable           go to state 117
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 67
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+    list_of_func_arg             go to state 118
+    func_arg                     go to state 119
 
-    3 ops: ops op .
 
-    $default  reduce using rule 3 (ops)
+State 58
 
+   90 nameles_func_def: FUNCTION '(' . ')' list_of_statements END
+   91                 | FUNCTION '(' . list_of_func_arg ')' list_of_statements END
 
-State 15
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 114
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    ')'       shift, and go to state 120
+    '{'       shift, and go to state 28
+
+    list_of_id                   go to state 116
+    list_of_assignable           go to state 117
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 67
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+    list_of_func_arg             go to state 121
+    func_arg                     go to state 119
 
-   14 value: FALSE .
 
-    $default  reduce using rule 14 (value)
+State 59
 
+   53 expr: NOT expr .
 
-State 16
+    $default  reduce using rule 53 (expr)
 
-   15 value: NIL .
 
-    $default  reduce using rule 15 (value)
+State 60
 
+   52 table_index: ID '[' . expr ']'
 
-State 17
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
 
-   13 value: TRUE .
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 122
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
 
-    $default  reduce using rule 13 (value)
 
+State 61
 
-State 18
+   44 assignable_without_func_def: '-' NUM .
 
-    9 expr: ID '=' ID .
+    $default  reduce using rule 44 (assignable_without_func_def)
 
-    $default  reduce using rule 9 (expr)
 
+State 62
 
-State 19
+   68 expr: '(' expr . ')'
 
-   11 value: NUM .
+    ')'  shift, and go to state 123
 
-    $default  reduce using rule 11 (value)
 
+State 63
 
-State 20
+   42 assignable_without_func_def: ID .
+   52 table_index: ID . '[' expr ']'
+   72 func_call: ID . '(' list_of_assignable ')'
+   73          | ID . '(' DOTS ')'
+   74          | ID . '(' ')'
+   75          | ID . table_def
+   76          | ID . STRING
+   82 table_assign: ID . '=' assignable
 
-   12 value: STRING .
+    STRING  shift, and go to state 48
+    '='     shift, and go to state 124
+    '('     shift, and go to state 49
+    '['     shift, and go to state 60
+    '{'     shift, and go to state 28
 
-    $default  reduce using rule 12 (value)
+    $default  reduce using rule 42 (assignable_without_func_def)
 
+    table_def  go to state 50
 
-State 21
 
-   16 value: '-' . value
+State 64
 
-    FALSE   shift, and go to state 15
-    NIL     shift, and go to state 16
-    TRUE    shift, and go to state 17
-    NUM     shift, and go to state 19
-    STRING  shift, and go to state 20
-    '-'     shift, and go to state 21
-    '!'     shift, and go to state 22
-    '('     shift, and go to state 23
+   83 table_assign: '[' . expr ']' '=' assignable
 
-    value  go to state 36
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
 
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 125
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
 
-State 22
 
-   17 value: '!' . value
+State 65
 
-    FALSE   shift, and go to state 15
-    NIL     shift, and go to state 16
-    TRUE    shift, and go to state 17
-    NUM     shift, and go to state 19
-    STRING  shift, and go to state 20
-    '-'     shift, and go to state 21
-    '!'     shift, and go to state 22
-    '('     shift, and go to state 23
+   77 table_def: '{' '}' .
 
-    value  go to state 37
+    $default  reduce using rule 77 (table_def)
 
 
-State 23
+State 66
 
-   18 value: '(' . expr ')'
+   21 list_of_assignable: list_of_assignable . ',' expr
+   78 table_def: '{' list_of_assignable . '}'
 
-    ID  shift, and go to state 33
+    ','  shift, and go to state 126
+    '}'  shift, and go to state 127
 
-    expr  go to state 38
 
+State 67
 
-State 24
+   22 list_of_assignable: expr .
 
-   10 expr: ID '=' value .
+    $default  reduce using rule 22 (list_of_assignable)
 
-    $default  reduce using rule 10 (expr)
 
+State 68
 
-State 25
+   79 table_def: '{' assign_list . '}'
+   81 assign_list: assign_list . ',' table_assign
 
-   24 func_arg: FALSE .
+    ','  shift, and go to state 128
+    '}'  shift, and go to state 129
 
-    $default  reduce using rule 24 (func_arg)
 
+State 69
 
-State 26
+   80 assign_list: table_assign .
 
-   23 func_arg: TRUE .
+    $default  reduce using rule 80 (assign_list)
 
-    $default  reduce using rule 23 (func_arg)
 
+State 70
 
-State 27
+   11 statement: IF expr THEN . list_of_statements elseif_block
 
-   26 func_arg: ID .
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
 
-    $default  reduce using rule 26 (func_arg)
+    list_of_statements  go to state 130
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
 
 
-State 28
+State 71
 
-   27 func_arg: NUM .
+   60 expr: assignable AND . expr
 
-    $default  reduce using rule 27 (func_arg)
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
 
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 131
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
 
-State 29
 
-   25 func_arg: STRING .
+State 72
 
-    $default  reduce using rule 25 (func_arg)
+   61 expr: assignable OR . expr
 
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
 
-State 30
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 132
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
 
-   19 func_call: ID '(' func_args . ')'
-   22 func_args: func_args . ',' func_arg
 
-    ')'  shift, and go to state 39
-    ','  shift, and go to state 40
+State 73
 
+   55 expr: assignable NE . expr
 
-State 31
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
 
-   21 func_args: func_arg .
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 133
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
 
-    $default  reduce using rule 21 (func_args)
 
+State 74
 
-State 32
+   54 expr: assignable EQ . expr
 
-   28 func_arg: table .
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 134
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 75
 
-    $default  reduce using rule 28 (func_arg)
+   56 expr: assignable LE . expr
 
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 135
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 76
+
+   57 expr: assignable GE . expr
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 136
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 77
+
+   62 expr: assignable ',' . expr
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 137
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 78
+
+   58 expr: assignable '<' . expr
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 138
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 79
+
+   59 expr: assignable '>' . expr
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 139
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 80
+
+   63 expr: assignable '+' . expr
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 140
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 81
+
+   64 expr: assignable '-' . expr
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 141
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 82
+
+   65 expr: assignable '*' . expr
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 142
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 83
+
+   66 expr: assignable '/' . expr
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 143
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 84
+
+   67 expr: assignable '%' . expr
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 144
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 85
+
+   85 func_def: LOCAL FUNCTION ID . '(' list_of_func_arg ')' list_of_statements END
+   87         | LOCAL FUNCTION ID . '(' ')' list_of_statements END
+   89         | LOCAL FUNCTION ID . '(' ')' END
+
+    '('  shift, and go to state 145
+
+
+State 86
+
+    5 statement: LOCAL list_of_id '=' . list_of_assignable
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    list_of_assignable           go to state 146
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 67
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 87
+
+    6 statement: LOCAL list_of_id ';' .
+
+    $default  reduce using rule 6 (statement)
+
+
+State 88
+
+   13 statement: REPEAT list_of_statements UNTIL . expr
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 147
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 89
+
+   25 expr_without_func_def: NOT expr_without_func_def .
+
+    $default  reduce using rule 25 (expr_without_func_def)
+
+
+State 90
+
+   40 expr_without_func_def: '(' expr_without_func_def . ')'
+
+    ')'  shift, and go to state 148
+
+
+State 91
+
+   23 list_of_assignable_without_func_def: list_of_assignable_without_func_def ',' . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 149
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 92
+
+   32 expr_without_func_def: assignable_without_func_def AND . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 150
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 93
+
+   33 expr_without_func_def: assignable_without_func_def OR . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 151
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 94
+
+   27 expr_without_func_def: assignable_without_func_def NE . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 152
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 95
+
+   26 expr_without_func_def: assignable_without_func_def EQ . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 153
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 96
+
+   28 expr_without_func_def: assignable_without_func_def LE . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 154
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 97
+
+   29 expr_without_func_def: assignable_without_func_def GE . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 155
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 98
+
+   34 expr_without_func_def: assignable_without_func_def ',' . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 156
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 99
+
+   30 expr_without_func_def: assignable_without_func_def '<' . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 157
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 100
+
+   31 expr_without_func_def: assignable_without_func_def '>' . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 158
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 101
+
+   35 expr_without_func_def: assignable_without_func_def '+' . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 159
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 102
+
+   36 expr_without_func_def: assignable_without_func_def '-' . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 160
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
+
+State 103
+
+   37 expr_without_func_def: assignable_without_func_def '*' . expr_without_func_def
+
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
+
+    expr_without_func_def        go to state 161
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
+
 
-State 33
+State 104
 
-    9 expr: ID . '=' ID
-   10     | ID . '=' value
+   38 expr_without_func_def: assignable_without_func_def '/' . expr_without_func_def
 
-    '='  shift, and go to state 8
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
 
+    expr_without_func_def        go to state 162
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
 
-State 34
 
-    7 exprs: exprs . expr
-   31 table: '{' exprs . '}'
+State 105
 
-    ID   shift, and go to state 33
-    '}'  shift, and go to state 41
+   39 expr_without_func_def: assignable_without_func_def '%' . expr_without_func_def
 
-    expr  go to state 42
+    FALSE   shift, and go to state 18
+    NIL     shift, and go to state 20
+    NOT     shift, and go to state 40
+    TRUE    shift, and go to state 22
+    ID      shift, and go to state 23
+    NUM     shift, and go to state 24
+    STRING  shift, and go to state 25
+    '-'     shift, and go to state 26
+    '('     shift, and go to state 41
+    '{'     shift, and go to state 28
 
+    expr_without_func_def        go to state 163
+    assignable_without_func_def  go to state 44
+    table_index                  go to state 30
+    func_call                    go to state 33
+    table_def                    go to state 34
 
-State 35
 
-    6 exprs: expr .
+State 106
 
-    $default  reduce using rule 6 (exprs)
+   12 statement: WHILE expr DO . list_of_statements END
 
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
 
-State 36
+    list_of_statements  go to state 164
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
 
-   16 value: '-' value .
 
-    $default  reduce using rule 16 (value)
+State 107
 
+   73 func_call: ID '(' DOTS . ')'
 
-State 37
+    ')'  shift, and go to state 165
 
-   17 value: '!' value .
 
-    $default  reduce using rule 17 (value)
+State 108
 
+   74 func_call: ID '(' ')' .
 
-State 38
+    $default  reduce using rule 74 (func_call)
 
-   18 value: '(' expr . ')'
 
-    ')'  shift, and go to state 43
+State 109
 
+   21 list_of_assignable: list_of_assignable . ',' expr
+   72 func_call: ID '(' list_of_assignable . ')'
 
-State 39
+    ','  shift, and go to state 126
+    ')'  shift, and go to state 166
 
-   19 func_call: ID '(' func_args ')' .
 
-    $default  reduce using rule 19 (func_call)
+State 110
 
+    4 statement: list_of_id '=' list_of_assignable .
+   21 list_of_assignable: list_of_assignable . ',' expr
 
-State 40
+    ','  shift, and go to state 126
 
-   22 func_args: func_args ',' . func_arg
+    $default  reduce using rule 4 (statement)
 
-    FALSE   shift, and go to state 25
-    TRUE    shift, and go to state 26
-    ID      shift, and go to state 27
-    NUM     shift, and go to state 28
-    STRING  shift, and go to state 29
-    '{'     shift, and go to state 10
 
-    func_arg  go to state 44
-    table     go to state 32
+State 111
 
+   20 list_of_id: list_of_id ',' ID .
 
-State 41
+    $default  reduce using rule 20 (list_of_id)
 
-   31 table: '{' exprs '}' .
 
-    $default  reduce using rule 31 (table)
+State 112
 
+   14 statement: FOR ID '=' list_of_assignable . DO list_of_statements END
+   21 list_of_assignable: list_of_assignable . ',' expr
 
-State 42
+    DO   shift, and go to state 167
+    ','  shift, and go to state 126
 
-    7 exprs: exprs expr .
 
-    $default  reduce using rule 7 (exprs)
+State 113
 
+   15 statement: FOR list_of_id IN assignable . DO list_of_statements END
 
-State 43
+    DO  shift, and go to state 168
 
-   18 value: '(' expr ')' .
 
-    $default  reduce using rule 18 (value)
+State 114
 
+   19 list_of_id: ID .
+   42 assignable_without_func_def: ID .
+   52 table_index: ID . '[' expr ']'
+   72 func_call: ID . '(' list_of_assignable ')'
+   73          | ID . '(' DOTS ')'
+   74          | ID . '(' ')'
+   75          | ID . table_def
+   76          | ID . STRING
 
-State 44
+    STRING  shift, and go to state 48
+    '('     shift, and go to state 49
+    '['     shift, and go to state 60
+    '{'     shift, and go to state 28
 
-   22 func_args: func_args ',' func_arg .
+    ','       reduce using rule 19 (list_of_id)
+    ','       [reduce using rule 42 (assignable_without_func_def)]
+    ')'       reduce using rule 19 (list_of_id)
+    ')'       [reduce using rule 42 (assignable_without_func_def)]
+    $default  reduce using rule 42 (assignable_without_func_def)
 
-    $default  reduce using rule 22 (func_args)
+    table_def  go to state 50
+
+
+State 115
+
+   86 func_def: FUNCTION ID '(' ')' . list_of_statements END
+   88         | FUNCTION ID '(' ')' . END
+
+    END       shift, and go to state 169
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    list_of_statements  go to state 170
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
+
+
+State 116
+
+   20 list_of_id: list_of_id . ',' ID
+   98 func_arg: list_of_id .
+
+    ','  shift, and go to state 54
+
+    ','       [reduce using rule 98 (func_arg)]
+    $default  reduce using rule 98 (func_arg)
+
+
+State 117
+
+   21 list_of_assignable: list_of_assignable . ',' expr
+   97 func_arg: list_of_assignable .
+
+    ','  shift, and go to state 126
+
+    ','       [reduce using rule 97 (func_arg)]
+    $default  reduce using rule 97 (func_arg)
+
+
+State 118
+
+   84 func_def: FUNCTION ID '(' list_of_func_arg . ')' list_of_statements END
+   93 list_of_func_arg: list_of_func_arg . ',' func_arg
+
+    ','  shift, and go to state 171
+    ')'  shift, and go to state 172
+
+
+State 119
+
+   92 list_of_func_arg: func_arg .
+
+    $default  reduce using rule 92 (list_of_func_arg)
+
+
+State 120
+
+   90 nameles_func_def: FUNCTION '(' ')' . list_of_statements END
+
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    list_of_statements  go to state 173
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
+
+
+State 121
+
+   91 nameles_func_def: FUNCTION '(' list_of_func_arg . ')' list_of_statements END
+   93 list_of_func_arg: list_of_func_arg . ',' func_arg
+
+    ','  shift, and go to state 171
+    ')'  shift, and go to state 174
+
+
+State 122
+
+   52 table_index: ID '[' expr . ']'
+
+    ']'  shift, and go to state 175
+
+
+State 123
+
+   68 expr: '(' expr ')' .
+
+    $default  reduce using rule 68 (expr)
+
+
+State 124
+
+   82 table_assign: ID '=' . assignable
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    assignable                   go to state 176
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 125
+
+   83 table_assign: '[' expr . ']' '=' assignable
+
+    ']'  shift, and go to state 177
+
+
+State 126
+
+   21 list_of_assignable: list_of_assignable ',' . expr
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 178
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 127
+
+   78 table_def: '{' list_of_assignable '}' .
+
+    $default  reduce using rule 78 (table_def)
+
+
+State 128
+
+   81 assign_list: assign_list ',' . table_assign
+
+    ID   shift, and go to state 179
+    '['  shift, and go to state 64
+
+    table_assign  go to state 180
+
+
+State 129
+
+   79 table_def: '{' assign_list '}' .
+
+    $default  reduce using rule 79 (table_def)
+
+
+State 130
+
+    3 list_of_statements: list_of_statements . statement
+   11 statement: IF expr THEN list_of_statements . elseif_block
+
+    ELSE      shift, and go to state 181
+    ELSEIF    shift, and go to state 182
+    END       shift, and go to state 183
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement     go to state 52
+    elseif_block  go to state 184
+    list_of_id    go to state 12
+    func_call     go to state 13
+    func_def      go to state 14
+
+
+State 131
+
+   60 expr: assignable AND expr .
+
+    $default  reduce using rule 60 (expr)
+
+
+State 132
+
+   61 expr: assignable OR expr .
+
+    $default  reduce using rule 61 (expr)
+
+
+State 133
+
+   55 expr: assignable NE expr .
+
+    $default  reduce using rule 55 (expr)
+
+
+State 134
+
+   54 expr: assignable EQ expr .
+
+    $default  reduce using rule 54 (expr)
+
+
+State 135
+
+   56 expr: assignable LE expr .
+
+    $default  reduce using rule 56 (expr)
+
+
+State 136
+
+   57 expr: assignable GE expr .
+
+    $default  reduce using rule 57 (expr)
+
+
+State 137
+
+   62 expr: assignable ',' expr .
+
+    $default  reduce using rule 62 (expr)
+
+
+State 138
+
+   58 expr: assignable '<' expr .
+
+    $default  reduce using rule 58 (expr)
+
+
+State 139
+
+   59 expr: assignable '>' expr .
+
+    $default  reduce using rule 59 (expr)
+
+
+State 140
+
+   63 expr: assignable '+' expr .
+
+    $default  reduce using rule 63 (expr)
+
+
+State 141
+
+   64 expr: assignable '-' expr .
+
+    $default  reduce using rule 64 (expr)
+
+
+State 142
+
+   65 expr: assignable '*' expr .
+
+    $default  reduce using rule 65 (expr)
+
+
+State 143
+
+   66 expr: assignable '/' expr .
+
+    $default  reduce using rule 66 (expr)
+
+
+State 144
+
+   67 expr: assignable '%' expr .
+
+    $default  reduce using rule 67 (expr)
+
+
+State 145
+
+   85 func_def: LOCAL FUNCTION ID '(' . list_of_func_arg ')' list_of_statements END
+   87         | LOCAL FUNCTION ID '(' . ')' list_of_statements END
+   89         | LOCAL FUNCTION ID '(' . ')' END
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 114
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    ')'       shift, and go to state 185
+    '{'       shift, and go to state 28
+
+    list_of_id                   go to state 116
+    list_of_assignable           go to state 117
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 67
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+    list_of_func_arg             go to state 186
+    func_arg                     go to state 119
+
+
+State 146
+
+    5 statement: LOCAL list_of_id '=' list_of_assignable .
+   21 list_of_assignable: list_of_assignable . ',' expr
+
+    ','  shift, and go to state 126
+
+    $default  reduce using rule 5 (statement)
+
+
+State 147
+
+   13 statement: REPEAT list_of_statements UNTIL expr .
+
+    $default  reduce using rule 13 (statement)
+
+
+State 148
+
+   40 expr_without_func_def: '(' expr_without_func_def ')' .
+
+    $default  reduce using rule 40 (expr_without_func_def)
+
+
+State 149
+
+   23 list_of_assignable_without_func_def: list_of_assignable_without_func_def ',' expr_without_func_def .
+
+    $default  reduce using rule 23 (list_of_assignable_without_func_def)
+
+
+State 150
+
+   32 expr_without_func_def: assignable_without_func_def AND expr_without_func_def .
+
+    $default  reduce using rule 32 (expr_without_func_def)
+
+
+State 151
+
+   33 expr_without_func_def: assignable_without_func_def OR expr_without_func_def .
+
+    $default  reduce using rule 33 (expr_without_func_def)
+
+
+State 152
+
+   27 expr_without_func_def: assignable_without_func_def NE expr_without_func_def .
+
+    $default  reduce using rule 27 (expr_without_func_def)
+
+
+State 153
+
+   26 expr_without_func_def: assignable_without_func_def EQ expr_without_func_def .
+
+    $default  reduce using rule 26 (expr_without_func_def)
+
+
+State 154
+
+   28 expr_without_func_def: assignable_without_func_def LE expr_without_func_def .
+
+    $default  reduce using rule 28 (expr_without_func_def)
+
+
+State 155
+
+   29 expr_without_func_def: assignable_without_func_def GE expr_without_func_def .
+
+    $default  reduce using rule 29 (expr_without_func_def)
+
+
+State 156
+
+   34 expr_without_func_def: assignable_without_func_def ',' expr_without_func_def .
+
+    $default  reduce using rule 34 (expr_without_func_def)
+
+
+State 157
+
+   30 expr_without_func_def: assignable_without_func_def '<' expr_without_func_def .
+
+    $default  reduce using rule 30 (expr_without_func_def)
+
+
+State 158
+
+   31 expr_without_func_def: assignable_without_func_def '>' expr_without_func_def .
+
+    $default  reduce using rule 31 (expr_without_func_def)
+
+
+State 159
+
+   35 expr_without_func_def: assignable_without_func_def '+' expr_without_func_def .
+
+    $default  reduce using rule 35 (expr_without_func_def)
+
+
+State 160
+
+   36 expr_without_func_def: assignable_without_func_def '-' expr_without_func_def .
+
+    $default  reduce using rule 36 (expr_without_func_def)
+
+
+State 161
+
+   37 expr_without_func_def: assignable_without_func_def '*' expr_without_func_def .
+
+    $default  reduce using rule 37 (expr_without_func_def)
+
+
+State 162
+
+   38 expr_without_func_def: assignable_without_func_def '/' expr_without_func_def .
+
+    $default  reduce using rule 38 (expr_without_func_def)
+
+
+State 163
+
+   39 expr_without_func_def: assignable_without_func_def '%' expr_without_func_def .
+
+    $default  reduce using rule 39 (expr_without_func_def)
+
+
+State 164
+
+    3 list_of_statements: list_of_statements . statement
+   12 statement: WHILE expr DO list_of_statements . END
+
+    END       shift, and go to state 187
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement   go to state 52
+    list_of_id  go to state 12
+    func_call   go to state 13
+    func_def    go to state 14
+
+
+State 165
+
+   73 func_call: ID '(' DOTS ')' .
+
+    $default  reduce using rule 73 (func_call)
+
+
+State 166
+
+   72 func_call: ID '(' list_of_assignable ')' .
+
+    $default  reduce using rule 72 (func_call)
+
+
+State 167
+
+   14 statement: FOR ID '=' list_of_assignable DO . list_of_statements END
+
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    list_of_statements  go to state 188
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
+
+
+State 168
+
+   15 statement: FOR list_of_id IN assignable DO . list_of_statements END
+
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    list_of_statements  go to state 189
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
+
+
+State 169
+
+   88 func_def: FUNCTION ID '(' ')' END .
+
+    $default  reduce using rule 88 (func_def)
+
+
+State 170
+
+    3 list_of_statements: list_of_statements . statement
+   86 func_def: FUNCTION ID '(' ')' list_of_statements . END
+
+    END       shift, and go to state 190
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement   go to state 52
+    list_of_id  go to state 12
+    func_call   go to state 13
+    func_def    go to state 14
+
+
+State 171
+
+   93 list_of_func_arg: list_of_func_arg ',' . func_arg
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 114
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    list_of_id                   go to state 116
+    list_of_assignable           go to state 117
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 67
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+    func_arg                     go to state 191
+
+
+State 172
+
+   84 func_def: FUNCTION ID '(' list_of_func_arg ')' . list_of_statements END
+
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    list_of_statements  go to state 192
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
+
+
+State 173
+
+    3 list_of_statements: list_of_statements . statement
+   90 nameles_func_def: FUNCTION '(' ')' list_of_statements . END
+
+    END       shift, and go to state 193
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement   go to state 52
+    list_of_id  go to state 12
+    func_call   go to state 13
+    func_def    go to state 14
+
+
+State 174
+
+   91 nameles_func_def: FUNCTION '(' list_of_func_arg ')' . list_of_statements END
+
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    list_of_statements  go to state 194
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
+
+
+State 175
+
+   52 table_index: ID '[' expr ']' .
+
+    $default  reduce using rule 52 (table_index)
+
+
+State 176
+
+   82 table_assign: ID '=' assignable .
+
+    $default  reduce using rule 82 (table_assign)
+
+
+State 177
+
+   83 table_assign: '[' expr ']' . '=' assignable
+
+    '='  shift, and go to state 195
+
+
+State 178
+
+   21 list_of_assignable: list_of_assignable ',' expr .
+
+    $default  reduce using rule 21 (list_of_assignable)
+
+
+State 179
+
+   82 table_assign: ID . '=' assignable
+
+    '='  shift, and go to state 124
+
+
+State 180
+
+   81 assign_list: assign_list ',' table_assign .
+
+    $default  reduce using rule 81 (assign_list)
+
+
+State 181
+
+   17 elseif_block: ELSE . list_of_statements END
+
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    list_of_statements  go to state 196
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
+
+
+State 182
+
+   18 elseif_block: ELSEIF . expr THEN list_of_statements elseif_block
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    NOT       shift, and go to state 21
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '('       shift, and go to state 27
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    expr                         go to state 197
+    assignable                   go to state 32
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 183
+
+   16 elseif_block: END .
+
+    $default  reduce using rule 16 (elseif_block)
+
+
+State 184
+
+   11 statement: IF expr THEN list_of_statements elseif_block .
+
+    $default  reduce using rule 11 (statement)
+
+
+State 185
+
+   87 func_def: LOCAL FUNCTION ID '(' ')' . list_of_statements END
+   89         | LOCAL FUNCTION ID '(' ')' . END
+
+    END       shift, and go to state 198
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    list_of_statements  go to state 199
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
+
+
+State 186
+
+   85 func_def: LOCAL FUNCTION ID '(' list_of_func_arg . ')' list_of_statements END
+   93 list_of_func_arg: list_of_func_arg . ',' func_arg
+
+    ','  shift, and go to state 171
+    ')'  shift, and go to state 200
+
+
+State 187
+
+   12 statement: WHILE expr DO list_of_statements END .
+
+    $default  reduce using rule 12 (statement)
+
+
+State 188
+
+    3 list_of_statements: list_of_statements . statement
+   14 statement: FOR ID '=' list_of_assignable DO list_of_statements . END
+
+    END       shift, and go to state 201
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement   go to state 52
+    list_of_id  go to state 12
+    func_call   go to state 13
+    func_def    go to state 14
+
+
+State 189
+
+    3 list_of_statements: list_of_statements . statement
+   15 statement: FOR list_of_id IN assignable DO list_of_statements . END
+
+    END       shift, and go to state 202
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement   go to state 52
+    list_of_id  go to state 12
+    func_call   go to state 13
+    func_def    go to state 14
+
+
+State 190
+
+   86 func_def: FUNCTION ID '(' ')' list_of_statements END .
+
+    $default  reduce using rule 86 (func_def)
+
+
+State 191
+
+   93 list_of_func_arg: list_of_func_arg ',' func_arg .
+
+    $default  reduce using rule 93 (list_of_func_arg)
+
+
+State 192
+
+    3 list_of_statements: list_of_statements . statement
+   84 func_def: FUNCTION ID '(' list_of_func_arg ')' list_of_statements . END
+
+    END       shift, and go to state 203
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement   go to state 52
+    list_of_id  go to state 12
+    func_call   go to state 13
+    func_def    go to state 14
+
+
+State 193
+
+   90 nameles_func_def: FUNCTION '(' ')' list_of_statements END .
+
+    $default  reduce using rule 90 (nameles_func_def)
+
+
+State 194
+
+    3 list_of_statements: list_of_statements . statement
+   91 nameles_func_def: FUNCTION '(' list_of_func_arg ')' list_of_statements . END
+
+    END       shift, and go to state 204
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement   go to state 52
+    list_of_id  go to state 12
+    func_call   go to state 13
+    func_def    go to state 14
+
+
+State 195
+
+   83 table_assign: '[' expr ']' '=' . assignable
+
+    FALSE     shift, and go to state 18
+    FUNCTION  shift, and go to state 19
+    NIL       shift, and go to state 20
+    TRUE      shift, and go to state 22
+    ID        shift, and go to state 23
+    NUM       shift, and go to state 24
+    STRING    shift, and go to state 25
+    '-'       shift, and go to state 26
+    '{'       shift, and go to state 28
+
+    assignable_without_func_def  go to state 29
+    table_index                  go to state 30
+    assignable                   go to state 205
+    func_call                    go to state 33
+    table_def                    go to state 34
+    nameles_func_def             go to state 35
+
+
+State 196
+
+    3 list_of_statements: list_of_statements . statement
+   17 elseif_block: ELSE list_of_statements . END
+
+    END       shift, and go to state 206
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement   go to state 52
+    list_of_id  go to state 12
+    func_call   go to state 13
+    func_def    go to state 14
+
+
+State 197
+
+   18 elseif_block: ELSEIF expr . THEN list_of_statements elseif_block
+
+    THEN  shift, and go to state 207
+
+
+State 198
+
+   89 func_def: LOCAL FUNCTION ID '(' ')' END .
+
+    $default  reduce using rule 89 (func_def)
+
+
+State 199
+
+    3 list_of_statements: list_of_statements . statement
+   87 func_def: LOCAL FUNCTION ID '(' ')' list_of_statements . END
+
+    END       shift, and go to state 208
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement   go to state 52
+    list_of_id  go to state 12
+    func_call   go to state 13
+    func_def    go to state 14
+
+
+State 200
+
+   85 func_def: LOCAL FUNCTION ID '(' list_of_func_arg ')' . list_of_statements END
+
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    list_of_statements  go to state 209
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
+
+
+State 201
+
+   14 statement: FOR ID '=' list_of_assignable DO list_of_statements END .
+
+    $default  reduce using rule 14 (statement)
+
+
+State 202
+
+   15 statement: FOR list_of_id IN assignable DO list_of_statements END .
+
+    $default  reduce using rule 15 (statement)
+
+
+State 203
+
+   84 func_def: FUNCTION ID '(' list_of_func_arg ')' list_of_statements END .
+
+    $default  reduce using rule 84 (func_def)
+
+
+State 204
+
+   91 nameles_func_def: FUNCTION '(' list_of_func_arg ')' list_of_statements END .
+
+    $default  reduce using rule 91 (nameles_func_def)
+
+
+State 205
+
+   83 table_assign: '[' expr ']' '=' assignable .
+
+    $default  reduce using rule 83 (table_assign)
+
+
+State 206
+
+   17 elseif_block: ELSE list_of_statements END .
+
+    $default  reduce using rule 17 (elseif_block)
+
+
+State 207
+
+   18 elseif_block: ELSEIF expr THEN . list_of_statements elseif_block
+
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    list_of_statements  go to state 210
+    statement           go to state 11
+    list_of_id          go to state 12
+    func_call           go to state 13
+    func_def            go to state 14
+
+
+State 208
+
+   87 func_def: LOCAL FUNCTION ID '(' ')' list_of_statements END .
+
+    $default  reduce using rule 87 (func_def)
+
+
+State 209
+
+    3 list_of_statements: list_of_statements . statement
+   85 func_def: LOCAL FUNCTION ID '(' list_of_func_arg ')' list_of_statements . END
+
+    END       shift, and go to state 211
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement   go to state 52
+    list_of_id  go to state 12
+    func_call   go to state 13
+    func_def    go to state 14
+
+
+State 210
+
+    3 list_of_statements: list_of_statements . statement
+   18 elseif_block: ELSEIF expr THEN list_of_statements . elseif_block
+
+    ELSE      shift, and go to state 181
+    ELSEIF    shift, and go to state 182
+    END       shift, and go to state 183
+    FOR       shift, and go to state 1
+    FUNCTION  shift, and go to state 2
+    IF        shift, and go to state 3
+    LOCAL     shift, and go to state 4
+    REPEAT    shift, and go to state 5
+    RETURN    shift, and go to state 6
+    WHILE     shift, and go to state 7
+    ID        shift, and go to state 8
+
+    statement     go to state 52
+    elseif_block  go to state 212
+    list_of_id    go to state 12
+    func_call     go to state 13
+    func_def      go to state 14
+
+
+State 211
+
+   85 func_def: LOCAL FUNCTION ID '(' list_of_func_arg ')' list_of_statements END .
+
+    $default  reduce using rule 85 (func_def)
+
+
+State 212
+
+   18 elseif_block: ELSEIF expr THEN list_of_statements elseif_block .
+
+    $default  reduce using rule 18 (elseif_block)

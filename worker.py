@@ -16,7 +16,7 @@ data = proc.communicate(input=str.encode(lines))
 
 outfile = "results/"
 etfile = "etalon/"
-name = sys.argv[1][len("tests/"):] + ".result"
+name = sys.argv[1][len("tests/"):] + ".result.txt"
 outfile = outfile + name
 etfile = etfile + name
 output = open(outfile, "w+")

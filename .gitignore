@@ -1,6 +1,7 @@
 *.c
 *.h
-*.out
+*.out*
 *.log
 results
 etalon
+tests

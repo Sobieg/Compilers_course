@@ -22,19 +22,19 @@ all: $(TARGET)
 clean clear: 
 	-$(RM) *.c *.h
 
-lex.yy.c: lua_syntax_check.lex
-	$(LEX) lua_syntax_check.lex
+lex.yy.c: course.l
+	$(LEX) course.l
 
-y.tab.c: lua_syntax_check.yacc
-	$(YACC) $(YFLAGS) lua_syntax_check.yacc
+y.tab.c: course.y
+	$(YACC) $(YFLAGS) course.y
 
 git:
-	$(GIT) checkout everymake-commit
-	$(GIT) add .
-	$(GIT) commit -am "make commit on $(shell date)"
+	$(GIT) commit -m "make commit on $(shell date)"
 
-compile: lex.yy.c y.tab.c y.tab.h git
+compile: lex.yy.c y.tab.c y.tab.h
 	$(CXX) lex.yy.c y.tab.c
+
+compile-git: git compile 
 
 debug: lex.yy.c
 	$(CXX) lex.yy.c 

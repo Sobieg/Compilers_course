@@ -7,25 +7,22 @@
 %option yylineno
 %option noyywrap
 
-/*
-for tests 
-%option main
-*/
-multiline_string "[["(.|\n)*?"]]"
-instring ([^\\\n"']|\\\n|\\["']|\\\\)*
-id [a-zA-Z_]+[a-zA-Z0-9_]*
-string ["']{instring}["']
-fname {id}|({id}"."{id})+
-idlist (({id})(" , "|" and "|" or ")*?)+
-everylist (({id}|{multiline_string}|{string}|{fname})(" , "|" and "|" or ")*?)+
+
+multiline_string ("[["(.|\n)*?"]]")|("[=["(.|\n)*?"]=]")
+instring ([^\\\n"']|\\\n|\\["']|\\\\|\\n|\\[0-9]{1,3}|\\r|\\t|\\"["|\\"]"|\\a|\\f|\\z|\\v|\\b)*
+single_id [a-zA-Z_]+[a-z0-9_]*
+single_string ["']{instring}["']
+string ({single_string})([ \t\r\n]*".."[ \t\r\n]*({single_string}|{id}))*
+stingid {id}([ \t\r\n]*".."[ \t\r\n]*({single_string}|{classid}|{id}))+
+id ({single_id}("."{single_id})+)|{single_id}
+classid {id}(":"{id})+
 onesymb [-+*/%=<>().,{}]
 whitespace [ \t\r\n]
 int [0-9]+
 double [0-9]"."[0-9]+
 
-
 %%
-"and"						{return AND;}
+"and"						return AND;
 "break"						return BREAK;
 "do"						return DO;
 "else" 						return ELSE;
@@ -51,47 +48,45 @@ double [0-9]"."[0-9]+
 "=="						return EQ;
 "<+"						return LE;
 ">="						return GE;
-".."						return CONC;
+".."						return CONC; //только на случай, если к переменной клеится строка или переменная к строке или две переменных. Случай строка-строка разобран
 "..."						return DOTS;
-{onesymb}					return *yytext;
+{onesymb}			return *yytext;
 
 
 "debug"						{	std::cout << "Debug switched" << std::endl;
 								yydebug = yydebug?0:1;
 							}
 
-"#"{id}						{
-								return NUM; //размер списка
+{single_id}					{
+								return ID;
 							}
-
-
-{int}					{	
-								return NUM;
-							}
-{double}				{
-								return NUM;
-							}
-
 
 {id}						{
-								std::cout << "ID" << std::endl;
-								return FID;
+								//std::cout << "ID" << std::endl;
+								return ID;
+							}
+{classid}					{return ID;}
+
+{int}					{	
+								//std::cout << yytext << std::endl;
+								return NUM;
+							}
+{double}			{
+								//std::cout << yytext << std::endl;
+								return NUM;
 							}
 
-{fname}						{
-								std::cout << "FID" << std::endl;
-								return FID;
+"#"{id}						{
+								return NUM; //Только для таблиц, но как мы поймем...
 							}
-	
-
-
-
 
 {string} 					{
 
 								//std::cout << "STRING" << std::endl;
 								return STRING;
 							}
+
+{stingid}					{return STRING;}
 
 {multiline_string}			{
 								//std::cout << "Multiline string" << std::endl;
@@ -109,12 +104,7 @@ double [0-9]"."[0-9]+
 								//return 0;
 							}
 
+[ \t\r\n] 					{}
 
-{whitespace} 				{}
-
-.			 				{							
-							//printf("%c", *yytext);
-							return *yytext;	
-							}
-						
+. 							{return *yytext;}
 %%

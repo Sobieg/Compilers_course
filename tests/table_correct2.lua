@@ -1,0 +1,1 @@
+t = { kkk = print('kek')}

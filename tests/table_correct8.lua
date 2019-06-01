@@ -1,0 +1,1 @@
+v = {print("kek"), print("nekek")}

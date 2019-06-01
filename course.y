@@ -189,6 +189,10 @@
     
     func_arg:                       list_of_assignable
                                     | list_of_id
+                                    | list_of_id ',' DOTS
+                                    ;
+
+
                                 
                                     
 %%

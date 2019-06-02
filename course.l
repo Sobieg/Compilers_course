@@ -7,10 +7,6 @@
 %option yylineno
 %option noyywrap
 
-/*
-/*string ({single_string})([ \t\r\n]*".."[ \t\r\n]*({single_string}|{id}))*
-/*stingid {id}([ \t\r\n]*".."[ \t\r\n]*({single_string}|{classid}|{id}))+
-/**/
 
 rigtend "]=]"
 lefend "[=["

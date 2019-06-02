@@ -119,6 +119,11 @@
     table_index:                    ID square_brackets
                                     | ID square_brackets ':' assignable
                                     | '(' ID square_brackets ')' ':' assignable
+                                    | '(' ID square_brackets ')' '.' assignable
+                                    | ID square_brackets '.' assignable
+                                    | func_call square_brackets
+                                    | func_call square_brackets ':' assignable
+                                    | func_call square_brackets '.' assignable
                                     ;
 
     square_brackets:                '[' expr ']'
@@ -160,8 +165,8 @@
                                     | assignable '%' expr 
                                     | '(' expr ')' '%' expr
                                     | '(' expr ')'
-                                    | assignable
                                     | assignable '.' assignable
+                                    | assignable
                                     | ','
                                     ;
 
@@ -182,6 +187,7 @@
                                     | ID '(' ')' ':' func_call
                                     | ID table_def
                                     | ID STRING
+                                    | func_call '(' ')'
                                     ;
     
     table_def:                      '{' '}'

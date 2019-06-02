@@ -27,8 +27,8 @@
                                     |
                                     ;
 
-    list_of_statements:             statement
-                                    | statement ';'
+    list_of_statements:             list_of_statements ';'
+                                    | statement
                                     | list_of_statements statement
                                     ;
 
@@ -127,6 +127,7 @@
                                     | func_call square_brackets
                                     | func_call square_brackets ':' assignable_without_func_def
                                     | func_call square_brackets '.' assignable_without_func_def
+                                    | ID square_brackets[op] '(' list_of_assignable_without_func_def ')'
                                     ;
 
     square_brackets:                '[' expr ']'

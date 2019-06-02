@@ -230,6 +230,7 @@
     
     func_returnable:                list_of_assignable_without_func_def
                                     | nameles_func_def
+                                    | DOTS
                                     |
                                     ;
     

@@ -207,8 +207,8 @@
                                     | assign_list ',' table_assign
                                     ;
 
-    table_assign:                   ID '=' assignable
-                                    | square_brackets '=' assignable
+    table_assign:                   ID '=' expr
+                                    | square_brackets '=' expr
                                     | DOTS
                                     ;
 

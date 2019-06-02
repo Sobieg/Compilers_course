@@ -27,6 +27,7 @@ onesymb [-+*/%=<>().,{}^]
 whitespace [ \t\r\n]
 int [0-9]+
 double [0-9]"."[0-9]+
+hex "0x"[0-9a-fA-F]+
 
 %%
 "and"						return AND;
@@ -90,17 +91,17 @@ double [0-9]"."[0-9]+
 								// std::cout << yytext << std::endl;
 								return NUM;
 							}
-
+{hex}						{return NUM;}
 
 
 {string} 					{
 
-								// std::cout << "STRING" << std::endl;
+								 //std::cout << yytext << std::endl;
 								return STRING;
 							}
 
 {stingid}					{
-								// std::cout << "STRING" << std::endl;
+								//std::cout << yytext << std::endl;
 								return STRING;
 							}
 

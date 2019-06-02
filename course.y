@@ -117,13 +117,13 @@
                                     ;
 
     table_index:                    ID square_brackets
-                                    | ID square_brackets ':' assignable
-                                    | '(' ID square_brackets ')' ':' assignable
-                                    | '(' ID square_brackets ')' '.' assignable
-                                    | ID square_brackets '.' assignable
+                                    | ID square_brackets ':' assignable_without_func_def
+                                    | '(' ID square_brackets ')' ':' assignable_without_func_def
+                                    | '(' ID square_brackets ')' '.' assignable_without_func_def
+                                    | ID square_brackets '.' assignable_without_func_def
                                     | func_call square_brackets
-                                    | func_call square_brackets ':' assignable
-                                    | func_call square_brackets '.' assignable
+                                    | func_call square_brackets ':' assignable_without_func_def
+                                    | func_call square_brackets '.' assignable_without_func_def
                                     ;
 
     square_brackets:                '[' expr ']'
@@ -177,14 +177,17 @@
     func_call:                      ID '(' list_of_assignable ')'
                                     | ID '(' list_of_assignable ',' DOTS')'
                                     | ID ':' func_call
-                                    | ID '(' list_of_assignable ')' ':' func_call
-                                    | ID '(' list_of_assignable ',' DOTS ')' ':' func_call
+                                    | ID '(' list_of_assignable ')' ':' assignable
+                                    | ID '(' list_of_assignable ')' '.' assignable
+                                    | ID '(' list_of_assignable ',' DOTS ')' ':' assignable
+
                                     | ID '(' list_of_assignable ':' list_of_assignable')'
-                                    | ID '(' list_of_assignable ':' list_of_assignable')' ':' func_call
+                                    | ID '(' list_of_assignable ':' list_of_assignable')' ':' assignable
+
                                     | ID '(' DOTS ')'
-                                    | ID '(' DOTS ')' ':' func_call
+                                    | ID '(' DOTS ')' ':' assignable
                                     | ID '(' ')'
-                                    | ID '(' ')' ':' func_call
+                                    | ID '(' ')' ':' assignable
                                     | ID table_def
                                     | ID STRING
                                     | func_call '(' ')'

@@ -27,8 +27,8 @@
                                     |
                                     ;
 
-    list_of_statements:             statement
-                                    | list_of_statements ';' statement
+    list_of_statements:             list_of_statements ';'
+                                    | statement
                                     | list_of_statements statement
                                     ;
 
@@ -43,7 +43,7 @@
                                     | REPEAT list_of_statements UNTIL expr
                                     | DO list_of_statements END
                                     | FOR ID '=' list_of_assignable DO list_of_statements END
-                                    | FOR list_of_id IN assignable DO list_of_statements END
+                                    | FOR list_of_id IN list_of_assignable DO list_of_statements END
                                     | BREAK
                                     ;
 
@@ -97,6 +97,8 @@
                                     | '(' expr_without_func_def ')' '/' expr_without_func_def
                                     | assignable_without_func_def '%' expr_without_func_def 
                                     | '(' expr_without_func_def ')' '%' expr_without_func_def
+                                    | assignable_without_func_def '^' expr_without_func_def 
+                                    | '(' expr_without_func_def ')' '^' expr_without_func_def
                                     | assignable_without_func_def
                                     | '(' expr_without_func_def ')'
                                     | assignable_without_func_def '.' assignable_without_func_def
@@ -114,6 +116,7 @@
                                     | func_call
                                     | table_index
                                     | table_def
+                                    | DOTS
                                     ;
 
     table_index:                    ID square_brackets
@@ -124,6 +127,7 @@
                                     | func_call square_brackets
                                     | func_call square_brackets ':' assignable_without_func_def
                                     | func_call square_brackets '.' assignable_without_func_def
+                                    | ID square_brackets[op] '(' list_of_assignable_without_func_def ')'
                                     ;
 
     square_brackets:                '[' expr ']'
@@ -164,6 +168,8 @@
                                     | '(' expr ')' '/' expr
                                     | assignable '%' expr 
                                     | '(' expr ')' '%' expr
+                                    | assignable '^' expr 
+                                    | '(' expr ')' '^' expr
                                     | '(' expr ')'
                                     | assignable '.' assignable
                                     | assignable
@@ -175,17 +181,13 @@
                                     ;
 
     func_call:                      ID '(' list_of_assignable ')'
-                                    | ID '(' list_of_assignable ',' DOTS')'
                                     | ID ':' func_call
                                     | ID '(' list_of_assignable ')' ':' assignable
                                     | ID '(' list_of_assignable ')' '.' assignable
-                                    | ID '(' list_of_assignable ',' DOTS ')' ':' assignable
 
                                     | ID '(' list_of_assignable ':' list_of_assignable')'
                                     | ID '(' list_of_assignable ':' list_of_assignable')' ':' assignable
 
-                                    | ID '(' DOTS ')'
-                                    | ID '(' DOTS ')' ':' assignable
                                     | ID '(' ')'
                                     | ID '(' ')' ':' assignable
                                     | ID table_def
@@ -195,6 +197,7 @@
     
     table_def:                      '{' '}'
                                     | '{' assign_list ',' '}'
+                                    | '{' assign_list ';' '}'
                                     | '{' table_list_of_assignable'}'
                                     | '{' assign_list '}'
                                     ;
@@ -205,11 +208,11 @@
     
     assign_list:                    table_assign
                                     | assign_list ',' table_assign
+                                    | assign_list ';' table_assign
                                     ;
 
     table_assign:                   ID '=' expr
                                     | square_brackets '=' expr
-                                    | DOTS
                                     ;
 
     func_def:                       FUNCTION ID '(' list_of_func_arg ')' list_of_statements END
@@ -234,9 +237,6 @@
                                     ;
     
     func_arg:                       list_of_assignable
-                                    | list_of_id
-                                    | list_of_id ',' DOTS
-                                    | DOTS
                                     ;
 
 

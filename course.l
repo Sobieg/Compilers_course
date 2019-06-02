@@ -23,7 +23,7 @@ string ({single_string})
 stingid {single_string}
 id ({single_id}("."{single_id})+)|{single_id}
 classid {id}(":"{id})+
-onesymb [-+*/%=<>().,{}]
+onesymb [-+*/%=<>().,{}^]
 whitespace [ \t\r\n]
 int [0-9]+
 double [0-9]"."[0-9]+

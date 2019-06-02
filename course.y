@@ -28,12 +28,12 @@
                                     ;
 
     list_of_statements:             statement
+                                    | list_of_statements ';' statement
                                     | list_of_statements statement
                                     ;
 
     statement:                      list_of_id '=' list_of_assignable
                                     | LOCAL list_of_id '=' list_of_assignable
-                                    | LOCAL list_of_id ';'
                                     | LOCAL list_of_id
                                     | func_def
                                     | func_call
@@ -67,30 +67,46 @@
                                     | expr_without_func_def
                                     ;
 
-    expr_without_func_def:          NOT expr_without_func_def  {/*Правая рекурсия, да, но с левой S/R сыпятся, пока не знаю, как исправить.*/}
+    expr_without_func_def:          
+                                    NOT expr_without_func_def  {/*Правая рекурсия, да, но с левой S/R сыпятся, пока не знаю, как исправить.*/}
                                     | assignable_without_func_def EQ expr_without_func_def
+                                    | '(' expr_without_func_def ')' EQ expr_without_func_def
                                     | assignable_without_func_def NE expr_without_func_def
+                                    | '(' expr_without_func_def ')' NE expr_without_func_def
                                     | assignable_without_func_def LE expr_without_func_def
+                                    | '(' expr_without_func_def ')' LE expr_without_func_def
                                     | assignable_without_func_def GE expr_without_func_def
+                                    | '(' expr_without_func_def ')' GE expr_without_func_def
                                     | assignable_without_func_def '<' expr_without_func_def
+                                    | '(' expr_without_func_def ')' '<' expr_without_func_def
                                     | assignable_without_func_def '>' expr_without_func_def
+                                    | '(' expr_without_func_def ')' '>' expr_without_func_def
                                     | assignable_without_func_def AND expr_without_func_def
+                                    | '(' expr_without_func_def ')' AND expr_without_func_def
                                     | assignable_without_func_def OR expr_without_func_def
+                                    | '(' expr_without_func_def ')' OR expr_without_func_def
                                     | assignable_without_func_def ',' expr_without_func_def
-                                    | assignable_without_func_def '+' expr_without_func_def        
+                                    | '(' expr_without_func_def ')' ',' expr_without_func_def
+                                    | assignable_without_func_def '+' expr_without_func_def  
+                                    | '(' expr_without_func_def ')' '+' expr_without_func_def      
                                     | assignable_without_func_def '-' expr_without_func_def
+                                    | '(' expr_without_func_def ')' '-' expr_without_func_def
                                     | assignable_without_func_def '*' expr_without_func_def
+                                    | '(' expr_without_func_def ')' '*' expr_without_func_def
                                     | assignable_without_func_def '/' expr_without_func_def
+                                    | '(' expr_without_func_def ')' '/' expr_without_func_def
                                     | assignable_without_func_def '%' expr_without_func_def 
-                                    | '(' expr_without_func_def ')'
+                                    | '(' expr_without_func_def ')' '%' expr_without_func_def
                                     | assignable_without_func_def
+                                    | '(' expr_without_func_def ')'
                                     | assignable_without_func_def '.' assignable_without_func_def
                                     | ','
                                     ;
 
-    assignable_without_func_def:    ID
-                                    | NUM
-                                    | '-' NUM   
+    assignable_without_func_def:    
+                                     '-' assignable_without_func_def
+                                    | ID
+                                    | NUM 
                                     | string
                                     | NIL  
                                     | TRUE
@@ -108,23 +124,37 @@
     string:                         '(' string ')' ':' assignable_without_func_def
                                     | STRING
                                     | assignable_without_func_def CONC assignable_without_func_def
+                                    | assignable_without_func_def CONC '(' expr_without_func_def ')'
                                     
                                     ;
 
     expr:                           NOT expr   
                                     | assignable EQ expr
+                                    | '(' expr ')' EQ expr
                                     | assignable NE expr
+                                    | '(' expr ')' NE expr
                                     | assignable LE expr
+                                    | '(' expr ')' LE expr
                                     | assignable GE expr
+                                    | '(' expr ')' GE expr
                                     | assignable '<' expr
+                                    | '(' expr ')' '<' expr
                                     | assignable '>' expr
+                                    | '(' expr ')' '>' expr
                                     | assignable AND expr
+                                    | '(' expr ')' AND expr
                                     | assignable OR expr
-                                    | assignable '+' expr         {/*нет необходимости поддерживтаь приоритет операций*/}
+                                    | '(' expr ')' OR expr
+                                    | assignable '+' expr
+                                    | '(' expr ')' '+' expr         
                                     | assignable '-' expr
+                                    | '(' expr ')' '-' expr
                                     | assignable '*' expr
+                                    | '(' expr ')' '*' expr
                                     | assignable '/' expr
+                                    | '(' expr ')' '/' expr
                                     | assignable '%' expr 
+                                    | '(' expr ')' '%' expr
                                     | '(' expr ')'
                                     | assignable
                                     | assignable '.' assignable
@@ -164,6 +194,7 @@
 
     table_assign:                   ID '=' assignable
                                     | '[' expr ']' '=' assignable
+                                    | DOTS
                                     ;
 
     func_def:                       FUNCTION ID '(' list_of_func_arg ')' list_of_statements END
@@ -190,6 +221,7 @@
     func_arg:                       list_of_assignable
                                     | list_of_id
                                     | list_of_id ',' DOTS
+                                    | DOTS
                                     ;
 
 

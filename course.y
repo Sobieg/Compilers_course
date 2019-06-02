@@ -43,7 +43,7 @@
                                     | REPEAT list_of_statements UNTIL expr
                                     | DO list_of_statements END
                                     | FOR ID '=' list_of_assignable DO list_of_statements END
-                                    | FOR list_of_id IN assignable DO list_of_statements END
+                                    | FOR list_of_id IN list_of_assignable DO list_of_statements END
                                     | BREAK
                                     ;
 

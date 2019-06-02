@@ -103,8 +103,8 @@
                                     | ','
                                     ;
 
-    assignable_without_func_def:    
-                                     '-' assignable_without_func_def
+    assignable_without_func_def:    '#' assignable_without_func_def
+                                    | '-' assignable_without_func_def
                                     | ID
                                     | NUM 
                                     | string
@@ -170,8 +170,10 @@
                                     ;
 
     func_call:                      ID '(' list_of_assignable ')'
+                                    | ID '(' list_of_assignable ',' DOTS')'
                                     | ID ':' func_call
                                     | ID '(' list_of_assignable ')' ':' func_call
+                                    | ID '(' list_of_assignable ',' DOTS ')' ':' func_call
                                     | ID '(' list_of_assignable ':' list_of_assignable')'
                                     | ID '(' list_of_assignable ':' list_of_assignable')' ':' func_call
                                     | ID '(' DOTS ')'

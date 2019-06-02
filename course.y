@@ -195,6 +195,7 @@
     
     table_def:                      '{' '}'
                                     | '{' assign_list ',' '}'
+                                    | '{' assign_list ';' '}'
                                     | '{' table_list_of_assignable'}'
                                     | '{' assign_list '}'
                                     ;
@@ -205,6 +206,7 @@
     
     assign_list:                    table_assign
                                     | assign_list ',' table_assign
+                                    | assign_list ';' table_assign
                                     ;
 
     table_assign:                   ID '=' expr

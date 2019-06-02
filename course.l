@@ -54,7 +54,7 @@ hex "0x"[0-9a-fA-F]+
 "while"						return WHILE;
 "~="						return NE;
 "=="						return EQ;
-"<+"						return LE;
+"<="						return LE;
 ">="						return GE;
 ".."						return CONC; //только на случай, если к переменной клеится строка или переменная к строке или две переменных. Случай строка-строка разобран
 "..."						return DOTS;

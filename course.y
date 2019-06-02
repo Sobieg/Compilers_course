@@ -55,7 +55,7 @@
     
     list_of_id:                     ID
                                     | list_of_id ',' ID
-                                    | ID '[' expr ']'
+                                    | ID square_brackets
                                     ;
 
     list_of_assignable:             list_of_assignable ',' expr
@@ -116,9 +116,13 @@
                                     | table_def
                                     ;
 
-    table_index:                    ID '[' expr ']'
-                                    | ID '[' expr ']' ':' assignable
-                                    | '(' ID '[' expr ']' ')' ':' assignable
+    table_index:                    ID square_brackets
+                                    | ID square_brackets ':' assignable
+                                    | '(' ID square_brackets ')' ':' assignable
+                                    ;
+
+    square_brackets:                '[' expr ']'
+                                    | square_brackets '[' expr ']'
                                     ;
     
     string:                         '(' string ')' ':' assignable_without_func_def
@@ -193,7 +197,7 @@
                                     ;
 
     table_assign:                   ID '=' assignable
-                                    | '[' expr ']' '=' assignable
+                                    | square_brackets '=' assignable
                                     | DOTS
                                     ;
 

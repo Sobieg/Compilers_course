@@ -45,6 +45,12 @@
                                     | DO list_of_statements END
                                     | FOR ID '=' list_of_assignable DO list_of_statements END
                                     | FOR list_of_id IN list_of_assignable DO list_of_statements END
+                                    | IF expr THEN  elseif_block
+                                    | WHILE expr DO  END
+                                    | REPEAT UNTIL expr
+                                    | DO  END
+                                    | FOR ID '=' list_of_assignable DO END
+                                    | FOR list_of_id IN list_of_assignable DO END
                                     | BREAK
                                     ;
 
@@ -129,7 +135,7 @@
                                     | func_call square_brackets
                                     | func_call square_brackets ':' assignable_without_func_def
                                     | func_call square_brackets '.' assignable_without_func_def
-                                    | ID square_brackets[op] '(' list_of_assignable_without_func_def ')'
+                                    | ID square_brackets '(' list_of_assignable_without_func_def ')'
                                     ;
 
     square_brackets:                '[' expr ']'
@@ -181,21 +187,6 @@
     assignable:                     assignable_without_func_def
                                     | nameles_func_def
                                     ;
-
-    func_call:                      ID '(' list_of_assignable ')'
-                                    | ID ':' func_call
-                                    | ID '(' list_of_assignable ')' ':' assignable
-                                    | ID '(' list_of_assignable ')' '.' assignable
-
-                                    | ID '(' list_of_assignable ':' list_of_assignable')'
-                                    | ID '(' list_of_assignable ':' list_of_assignable')' ':' assignable
-
-                                    | ID '(' ')'
-                                    | ID '(' ')' ':' assignable
-                                    | ID table_def
-                                    | ID STRING
-                                    | func_call '(' ')'
-                                    ;
     
     table_def:                      '{' '}'
                                     | '{' assign_list ',' '}'
@@ -217,12 +208,29 @@
                                     | square_brackets '=' expr
                                     ;
 
-    func_def:                       FUNCTION ID '(' list_of_func_arg ')' list_of_statements END
+    func_def:                       FUNCTION ID '(' list_of_func_arg ')' list_of_statements END 
                                     | LOCAL FUNCTION ID '(' list_of_func_arg ')' list_of_statements END
                                     | FUNCTION ID '(' ')' list_of_statements END
                                     | LOCAL FUNCTION ID '(' ')' list_of_statements END
                                     | FUNCTION ID '(' ')' END
                                     | LOCAL FUNCTION ID '(' ')' END
+                                    ;
+
+    func_call:                      ID '(' list_of_assignable ')'
+                                    | ID ':' func_call
+                                    | ID '(' list_of_assignable ')' ':' assignable
+                                    | ID '(' list_of_assignable ')' '.' assignable
+                                    | ID '(' list_of_assignable ':' list_of_assignable')'
+                                    | ID '(' list_of_assignable ':' list_of_assignable')' ':' assignable
+                                    | ID '(' ')'
+                                    | ID '(' ')' ':' assignable
+                                    | ID table_def
+                                    | ID table_def ':' func_call
+                                    | ID table_def '.' func_call
+                                    | ID STRING
+                                    | ID STRING ':' func_call
+                                    | ID STRING '.' func_call 
+                                    | func_call '(' ')'
                                     ;
     
     nameles_func_def:               FUNCTION '(' ')' list_of_statements END

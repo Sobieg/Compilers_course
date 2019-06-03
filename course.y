@@ -37,6 +37,7 @@
                                     | LOCAL list_of_id
                                     | func_def
                                     | func_call
+                                    | func_call '=' list_of_assignable
                                     | GOTO ID
                                     | RETURN func_returnable
                                     | IF expr THEN list_of_statements elseif_block
@@ -209,10 +210,10 @@
                                     | square_brackets '=' expr
                                     ;
 
-    func_def:                       FUNCTION ID '(' list_of_func_arg ')' list_of_statements END 
-                                    | LOCAL FUNCTION ID '(' list_of_func_arg ')' list_of_statements END
-                                    | FUNCTION ID '(' ')' list_of_statements END
-                                    | LOCAL FUNCTION ID '(' ')' list_of_statements END
+    func_def:                       FUNCTION ID '(' list_of_func_arg ')' program END 
+                                    | LOCAL FUNCTION ID '(' list_of_func_arg ')' program END
+                                    | FUNCTION ID '(' ')' program END
+                                    | LOCAL FUNCTION ID '(' ')' program END
                                     | FUNCTION ID '(' ')' END
                                     | LOCAL FUNCTION ID '(' ')' END
                                     ;
@@ -234,8 +235,8 @@
                                     | func_call '(' ')'
                                     ;
     
-    nameles_func_def:               FUNCTION '(' ')' list_of_statements END
-                                    | FUNCTION '(' list_of_func_arg ')' list_of_statements END
+    nameles_func_def:               FUNCTION '(' ')' program END
+                                    | FUNCTION '(' list_of_func_arg ')' program END
                                     ;
 
     list_of_func_arg:               func_arg

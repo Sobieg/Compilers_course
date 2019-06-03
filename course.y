@@ -63,6 +63,7 @@
     list_of_id:                     ID
                                     | list_of_id ',' ID
                                     | list_of_id ',' table_index
+                                    | table_index
                                     ;
 
     list_of_assignable:             list_of_assignable ',' expr

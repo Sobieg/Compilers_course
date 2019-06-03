@@ -7,27 +7,27 @@
 %option yylineno
 %option noyywrap
 
-/*
-/*string ({single_string})([ \t\r\n]*".."[ \t\r\n]*({single_string}|{id}))*
-/*stingid {id}([ \t\r\n]*".."[ \t\r\n]*({single_string}|{classid}|{id}))+
-/**/
 
 rigtend "]=]"
 lefend "[=["
-multiline_string (("[["([^]]*|[]]{1})"]]")|("[=["([^]*]|("]"[^=])*|("]="[^]])*)"]=]"))
-instring_1 ([^\\\n"]|\\\n|\\["']|\\\\|\\n|\\[0-9]{1,3}|\\r|\\t|\\"["|\\"]"|\\a|\\f|\\z|\\v|\\b)*
-instring_2 ([^\\\n']|\\\n|\\["']|\\\\|\\n|\\[0-9]{1,3}|\\r|\\t|\\"["|\\"]"|\\a|\\f|\\z|\\v|\\b)*
+string_in_sq_br_1 "[["(([^]]|[\n])*|"]")*"]]"
+string_in_sq_br_2 "[=["(("="[^]*])|(.|\n))*"]=]"
+multiline_string (({string_in_sq_br_1})|({string_in_sq_br_2}))
+instring_1 ([^\\\n"]|\\\n|\\["']|\\\\|\\n|\\[0-9a-fA-F]{1,3}|\\x[0-9a-fA-F]{1,3}|\\r|\\t|\\"["|\\"]"|\\a|\\f|\\z|\\v|\\b)*
+instring_2 ([^\\\n']|\\\n|\\["']|\\\\|\\n|\\[0-9a-fA-F]{1,3}|\\x[0-9a-fA-F]{1,3}|\\r|\\t|\\"["|\\"]"|\\a|\\f|\\z|\\v|\\b)*
 single_id [a-zA-Z_]+[a-z0-9_]*
 single_string ["]{instring_1}["]|[']{instring_2}[']
 string ({single_string})
 stingid {single_string}
-id ({single_id}("."{single_id})+)|{single_id}
+id ({single_id}([.:]{single_id})+)|{single_id}
 classid {id}(":"{id})+
 onesymb [-+*/%=<>().,{}^]
 whitespace [ \t\r\n]
 int [0-9]+
-double [0-9]"."[0-9]+
+double [0-9]*"."[0-9]+
 hex "0x"[0-9a-fA-F]+
+exp {int}[eE]-?{int}
+label "::"{id}"::"
 
 %%
 "and"						return AND;
@@ -62,7 +62,7 @@ hex "0x"[0-9a-fA-F]+
 								// std::cout << *yytext << std::endl;
 								return *yytext;
 							}
-
+{label}						{}
 
 "debug"						{	
 								std::cout << "Debug switched" << std::endl;
@@ -75,7 +75,7 @@ hex "0x"[0-9a-fA-F]+
 							}
 
 {id}						{
-								// std::cout << "ID" << std::endl;
+								//std::cout << "ID" << std::endl;
 								return ID;
 							}
 {classid}					{
@@ -92,6 +92,7 @@ hex "0x"[0-9a-fA-F]+
 								return NUM;
 							}
 {hex}						{return NUM;}
+{exp}						{return NUM;}
 
 
 {string} 					{

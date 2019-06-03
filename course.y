@@ -37,6 +37,7 @@
                                     | LOCAL list_of_id
                                     | func_def
                                     | func_call
+                                    | GOTO ID
                                     | RETURN func_returnable
                                     | IF expr THEN list_of_statements elseif_block
                                     | WHILE expr DO list_of_statements END
@@ -44,6 +45,12 @@
                                     | DO list_of_statements END
                                     | FOR ID '=' list_of_assignable DO list_of_statements END
                                     | FOR list_of_id IN list_of_assignable DO list_of_statements END
+                                    | IF expr THEN elseif_block
+                                    | WHILE expr DO  END
+                                    | REPEAT UNTIL expr
+                                    | DO END
+                                    | FOR ID '=' list_of_assignable DO END
+                                    | FOR list_of_id IN list_of_assignable DO END
                                     | BREAK
                                     ;
 
@@ -55,7 +62,8 @@
     
     list_of_id:                     ID
                                     | list_of_id ',' ID
-                                    | ID square_brackets
+                                    | list_of_id ',' table_index
+                                    | table_index
                                     ;
 
     list_of_assignable:             list_of_assignable ',' expr
@@ -127,7 +135,8 @@
                                     | func_call square_brackets
                                     | func_call square_brackets ':' assignable_without_func_def
                                     | func_call square_brackets '.' assignable_without_func_def
-                                    | ID square_brackets[op] '(' list_of_assignable_without_func_def ')'
+                                    | '(' table_def ')' square_brackets
+                                    | table_def square_brackets
                                     ;
 
     square_brackets:                '[' expr ']'
@@ -136,6 +145,7 @@
     
     string:                         '(' string ')' ':' assignable_without_func_def
                                     | STRING
+                                    | string ':' func_call
                                     | assignable_without_func_def CONC assignable_without_func_def
                                     | assignable_without_func_def CONC '(' expr_without_func_def ')'
                                     
@@ -179,21 +189,6 @@
     assignable:                     assignable_without_func_def
                                     | nameles_func_def
                                     ;
-
-    func_call:                      ID '(' list_of_assignable ')'
-                                    | ID ':' func_call
-                                    | ID '(' list_of_assignable ')' ':' assignable
-                                    | ID '(' list_of_assignable ')' '.' assignable
-
-                                    | ID '(' list_of_assignable ':' list_of_assignable')'
-                                    | ID '(' list_of_assignable ':' list_of_assignable')' ':' assignable
-
-                                    | ID '(' ')'
-                                    | ID '(' ')' ':' assignable
-                                    | ID table_def
-                                    | ID STRING
-                                    | func_call '(' ')'
-                                    ;
     
     table_def:                      '{' '}'
                                     | '{' assign_list ',' '}'
@@ -215,16 +210,38 @@
                                     | square_brackets '=' expr
                                     ;
 
-    func_def:                       FUNCTION ID '(' list_of_func_arg ')' list_of_statements END
+    func_def:                       FUNCTION ID '(' list_of_func_arg ')' list_of_statements END 
                                     | LOCAL FUNCTION ID '(' list_of_func_arg ')' list_of_statements END
                                     | FUNCTION ID '(' ')' list_of_statements END
                                     | LOCAL FUNCTION ID '(' ')' list_of_statements END
                                     | FUNCTION ID '(' ')' END
                                     | LOCAL FUNCTION ID '(' ')' END
+                                    | FUNCTION ID '(' list_of_func_arg ')' END
+                                    | LOCAL FUNCTION ID '(' list_of_func_arg ')' END
+                                    ;
+
+    func_call:                      ID '(' list_of_assignable ')'
+                                    | ID '(' list_of_assignable ')' ':' assignable
+                                    | ID '(' list_of_assignable ')' '.' assignable
+                                    | ID '(' ')'
+                                    | ID '(' ')' ':' assignable
+                                    | ID '(' ')' '.' assignable
+                                    | ID table_def
+                                    | ID table_def ':' assignable
+                                    | ID table_def '.' assignable
+                                    | ID STRING
+                                    | ID STRING ':' assignable
+                                    | ID STRING '.' assignable 
+                                    | func_call '(' ')'
+                                    | func_call '(' list_of_assignable ')'
+                                    | table_index '(' ')'
+                                    | table_index '(' list_of_assignable ')'
                                     ;
     
     nameles_func_def:               FUNCTION '(' ')' list_of_statements END
                                     | FUNCTION '(' list_of_func_arg ')' list_of_statements END
+                                    | FUNCTION '(' list_of_func_arg ')' END
+                                    | FUNCTION '(' ')' END
                                     ;
 
     list_of_func_arg:               func_arg

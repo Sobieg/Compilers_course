@@ -1,0 +1,1 @@
+a = s[fs].sdg.gdsg.dsg:sgdgds[sdg]:dsg[].gsd:sdg().sdg():sdg()

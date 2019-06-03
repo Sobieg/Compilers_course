@@ -19,7 +19,7 @@ single_id [a-zA-Z_]+[a-z0-9_]*
 single_string ["]{instring_1}["]|[']{instring_2}[']
 string ({single_string})
 stingid {single_string}
-id ({single_id}("."{single_id})+)|{single_id}
+id ({single_id}([.:]{single_id})+)|{single_id}
 classid {id}(":"{id})+
 onesymb [-+*/%=<>().,{}^]
 whitespace [ \t\r\n]
@@ -75,7 +75,7 @@ label "::"{id}"::"
 							}
 
 {id}						{
-								// std::cout << "ID" << std::endl;
+								//std::cout << "ID" << std::endl;
 								return ID;
 							}
 {classid}					{

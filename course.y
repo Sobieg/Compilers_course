@@ -136,6 +136,7 @@
                                     | func_call square_brackets ':' assignable_without_func_def
                                     | func_call square_brackets '.' assignable_without_func_def
                                     | ID square_brackets '(' list_of_assignable_without_func_def ')'
+                                    | '(' assignable_without_func_def ')' square_brackets
                                     ;
 
     square_brackets:                '[' expr ']'

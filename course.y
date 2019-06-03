@@ -137,6 +137,7 @@
                                     | func_call square_brackets '.' assignable_without_func_def
                                     | '(' table_def ')' square_brackets
                                     | table_def square_brackets
+
                                     ;
 
     square_brackets:                '[' expr ']'
@@ -191,7 +192,6 @@
                                     ;
     
     table_def:                      '{' '}'
-                                    | '{' assign_list ',' '}'
                                     | '{' assign_list ';' '}'
                                     | '{' table_list_of_assignable'}'
                                     | '{' assign_list '}'
@@ -201,9 +201,12 @@
                                     | list_of_assignable ','
                                     ;
     
-    assign_list:                    table_assign
+    assign_list:                    assign_list ','
+                                    | assign_list ';'
+                                    | table_assign
                                     | assign_list ',' table_assign
                                     | assign_list ';' table_assign
+                                    | assign_list ',' DOTS
                                     ;
 
     table_assign:                   ID '=' expr

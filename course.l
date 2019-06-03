@@ -10,9 +10,9 @@
 
 rigtend "]=]"
 lefend "[=["
-string_in_sq_br_1 "[["([^]]*|[]]{1})"]]"
-string_in_sq_br_2 "[=["("="[^]])*"]=]"
-multiline_string ({string_in_sq_br_1}|{string_in_sq_br_2})
+string_in_sq_br_1 "[["(([^]]|[\n])*|"]")*"]]"
+string_in_sq_br_2 "[=["(("="[^]*])|(.|\n))*"]=]"
+multiline_string (({string_in_sq_br_1})|({string_in_sq_br_2}))
 instring_1 ([^\\\n"]|\\\n|\\["']|\\\\|\\n|\\[0-9]{1,3}|\\r|\\t|\\"["|\\"]"|\\a|\\f|\\z|\\v|\\b)*
 instring_2 ([^\\\n']|\\\n|\\["']|\\\\|\\n|\\[0-9]{1,3}|\\r|\\t|\\"["|\\"]"|\\a|\\f|\\z|\\v|\\b)*
 single_id [a-zA-Z_]+[a-z0-9_]*
@@ -113,7 +113,7 @@ label "::"{id}"::"
 
 
 "--"{multiline_string}	{
-								//printf("Multiline comment\n");
+								printf("Multiline comment\n");
 								//return 0;
 							}
 

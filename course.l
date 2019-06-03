@@ -24,7 +24,7 @@ classid {id}(":"{id})+
 onesymb [-+*/%=<>().,{}^]
 whitespace [ \t\r\n]
 int [0-9]+
-double [0-9]"."[0-9]+
+double [0-9]*"."[0-9]+
 hex "0x"[0-9a-fA-F]+
 exp {int}[eE]-?{int}
 label "::"{id}"::"

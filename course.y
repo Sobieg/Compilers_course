@@ -37,6 +37,7 @@
                                     | LOCAL list_of_id
                                     | func_def
                                     | func_call
+                                    | GOTO ID
                                     | RETURN func_returnable
                                     | IF expr THEN list_of_statements elseif_block
                                     | WHILE expr DO list_of_statements END
@@ -56,6 +57,7 @@
     list_of_id:                     ID
                                     | list_of_id ',' ID
                                     | ID square_brackets
+                                    | list_of_id ',' table_index
                                     ;
 
     list_of_assignable:             list_of_assignable ',' expr

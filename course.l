@@ -13,8 +13,8 @@ lefend "[=["
 string_in_sq_br_1 "[["(([^]]|[\n])*|"]")*"]]"
 string_in_sq_br_2 "[=["(("="[^]*])|(.|\n))*"]=]"
 multiline_string (({string_in_sq_br_1})|({string_in_sq_br_2}))
-instring_1 ([^\\\n"]|\\\n|\\["']|\\\\|\\n|\\[0-9]{1,3}|\\r|\\t|\\"["|\\"]"|\\a|\\f|\\z|\\v|\\b)*
-instring_2 ([^\\\n']|\\\n|\\["']|\\\\|\\n|\\[0-9]{1,3}|\\r|\\t|\\"["|\\"]"|\\a|\\f|\\z|\\v|\\b)*
+instring_1 ([^\\\n"]|\\\n|\\["']|\\\\|\\n|\\[0-9a-fA-F]{1,3}|\\r|\\t|\\"["|\\"]"|\\a|\\f|\\z|\\v|\\b)*
+instring_2 ([^\\\n']|\\\n|\\["']|\\\\|\\n|\\[0-9a-fA-F]{1,3}|\\r|\\t|\\"["|\\"]"|\\a|\\f|\\z|\\v|\\b)*
 single_id [a-zA-Z_]+[a-z0-9_]*
 single_string ["]{instring_1}["]|[']{instring_2}[']
 string ({single_string})

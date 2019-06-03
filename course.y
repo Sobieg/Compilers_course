@@ -48,7 +48,7 @@
                                     | IF expr THEN elseif_block
                                     | WHILE expr DO  END
                                     | REPEAT UNTIL expr
-                                    | DO  END
+                                    | DO END
                                     | FOR ID '=' list_of_assignable DO END
                                     | FOR list_of_id IN list_of_assignable DO END
                                     | BREAK
@@ -216,6 +216,8 @@
                                     | LOCAL FUNCTION ID '(' ')' list_of_statements END
                                     | FUNCTION ID '(' ')' END
                                     | LOCAL FUNCTION ID '(' ')' END
+                                    | FUNCTION ID '(' list_of_func_arg ')' END
+                                    | LOCAL FUNCTION ID '(' list_of_func_arg ')' END
                                     ;
 
     func_call:                      ID '(' list_of_assignable ')'

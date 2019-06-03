@@ -240,6 +240,8 @@
     
     nameles_func_def:               FUNCTION '(' ')' list_of_statements END
                                     | FUNCTION '(' list_of_func_arg ')' list_of_statements END
+                                    | FUNCTION '(' list_of_func_arg ')' END
+                                    | FUNCTION '(' ')' END
                                     ;
 
     list_of_func_arg:               func_arg

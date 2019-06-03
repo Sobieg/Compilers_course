@@ -45,7 +45,7 @@
                                     | DO list_of_statements END
                                     | FOR ID '=' list_of_assignable DO list_of_statements END
                                     | FOR list_of_id IN list_of_assignable DO list_of_statements END
-                                    | IF expr THEN  elseif_block
+                                    | IF expr THEN elseif_block
                                     | WHILE expr DO  END
                                     | REPEAT UNTIL expr
                                     | DO  END
@@ -62,7 +62,6 @@
     
     list_of_id:                     ID
                                     | list_of_id ',' ID
-                                    | ID square_brackets
                                     | list_of_id ',' table_index
                                     ;
 
@@ -135,7 +134,6 @@
                                     | func_call square_brackets
                                     | func_call square_brackets ':' assignable_without_func_def
                                     | func_call square_brackets '.' assignable_without_func_def
-                                    | ID square_brackets '(' list_of_assignable_without_func_def ')'
                                     | '(' table_def ')' square_brackets
                                     | table_def square_brackets
                                     ;
@@ -233,6 +231,8 @@
                                     | ID STRING '.' assignable 
                                     | func_call '(' ')'
                                     | func_call '(' list_of_assignable ')'
+                                    | table_index '(' ')'
+                                    | table_index '(' list_of_assignable ')'
                                     ;
     
     nameles_func_def:               FUNCTION '(' ')' list_of_statements END

@@ -113,7 +113,7 @@ label "::"{id}"::"
 
 
 "--"{multiline_string}	{
-								printf("Multiline comment\n");
+								//printf("Multiline comment\n");
 								//return 0;
 							}
 

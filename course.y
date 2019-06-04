@@ -193,7 +193,9 @@
     
     table_def:                      '{' '}'
                                     | '{' assign_list ';' '}'
-                                    | '{' table_list_of_assignable'}'
+                                    | '{' table_list_of_assignable ';' assign_list'}'
+                                    | '{' table_list_of_assignable '}'
+                                    | '{' table_list_of_assignable ',' assign_list '}'
                                     | '{' assign_list '}'
                                     ;
 
